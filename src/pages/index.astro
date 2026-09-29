@@ -11,29 +11,14 @@ import SiteFooter from "../components/SiteFooter.astro";
 import FullScheduleModal from "../components/FullScheduleModal.astro";
 import ActivityDetailModal from "../components/ActivityDetailModal.astro";
 import { feria } from "../data/feria";
+import { getFairState } from "../utils/fairState";
 
-// ─── Determinar el día actual ─────────────────────────────────────────────────
-const todayISO = new Date().toISOString().split("T")[0];
-let todayIndex = feria.days.findIndex((d) => d.date === todayISO);
-
-// Fallback para demo: si estamos fuera del rango de la feria usamos el día 1
-// (Martes 06, índice 1) para mostrar un día con variedad de actividades.
-if (todayIndex === -1) todayIndex = 1;
-
-const todayDay = feria.days[todayIndex];
-const dayNumber = todayIndex + 1;
+// ─── Estado temporal de la feria (Zona Horaria Oficial: America/Tegucigalpa) ───
+const fairState = getFairState();
 
 // ─── Meta dinámica ────────────────────────────────────────────────────────────
-const fullDate = new Date(todayDay.date + "T12:00:00");
-const dayLabel = fullDate.toLocaleDateString("es-HN", {
-  weekday: "long",
-  day: "numeric",
-  month: "long",
-});
-const dayLabelCap = dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1);
-
-const pageTitle = `${feria.name} ${feria.year} — ${dayLabelCap}`;
-const pageDesc = `Programa del ${dayLabelCap} en la ${feria.name} ${feria.year}. Actividades, restaurantes y guía de ${feria.town}, ${feria.department}.`;
+const pageTitle = `${feria.name} ${feria.year} — ${fairState.dateFormatted}`;
+const pageDesc = `Guía y programa oficial de la ${feria.name} ${feria.year} en ${feria.town}, ${feria.department}. Fechas: ${fairState.dateRangeLabel}.`;
 ---
 
 <BaseLayout title={pageTitle} description={pageDesc}>
@@ -49,17 +34,13 @@ const pageDesc = `Programa del ${dayLabelCap} en la ${feria.name} ${feria.year}.
       town={feria.town}
       department={feria.department}
       year={feria.year}
-      startDate={feria.startDate}
-      endDate={feria.endDate}
-      currentDayNumber={dayNumber}
-      totalDays={feria.totalDays}
+      fairState={fairState}
     />
 
-    <!-- ③ ¿Qué hay hoy? — recibe TODOS los días para la navegación client-side -->
+    <!-- ③ Sección principal según el estado temporal (BEFORE / DURING / AFTER) -->
     <TodaySection
+      fairState={fairState}
       days={feria.days}
-      initialDayIndex={todayIndex}
-      totalDays={feria.totalDays}
     />
 
     <!-- ④ Descubre el pueblo -->
@@ -84,7 +65,10 @@ const pageDesc = `Programa del ${dayLabelCap} en la ${feria.name} ${feria.year}.
   />
 
   <!-- ⑧ Modal / Bottom Sheet del Programa Completo -->
-  <FullScheduleModal days={feria.days} initialDayIndex={todayIndex} />
+  <FullScheduleModal
+    days={feria.days}
+    initialDayIndex={fairState.currentDayIndex}
+  />
 
   <!-- ⑨ Modal / Bottom Sheet del Detalle de Actividad -->
   <ActivityDetailModal />

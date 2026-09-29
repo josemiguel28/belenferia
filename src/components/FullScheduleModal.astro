@@ -146,23 +146,41 @@ const dateRangeSubtitle = `${startDayNum}–${endDayNum} de ${monthName}`;
 </div>
 
 <script>
-  import { animate } from "motion";
-
   function initModal() {
     const backdrop = document.getElementById("schedule-modal-backdrop");
     const modal = document.getElementById("schedule-modal");
     const closeBtn = document.getElementById("schedule-modal-close");
+    if (!backdrop || !modal) return;
+
+    if (backdrop.dataset.modalBound === "true") return;
+    backdrop.dataset.modalBound = "true";
+
     const dayItems = Array.from(
       document.querySelectorAll<HTMLDetailsElement>(".schedule-day"),
     );
-
-    if (!backdrop || !modal) return;
 
     const initialIdx = parseInt(
       backdrop.dataset.initialTodayIndex || "0",
       10,
     );
-    const todayISO = new Date().toISOString().split("T")[0];
+
+    let todayISO = "";
+    try {
+      const formatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Tegucigalpa",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      });
+      const parts = formatter.formatToParts(new Date());
+      const y = parts.find((p) => p.type === "year")?.value;
+      const m = parts.find((p) => p.type === "month")?.value;
+      const d = parts.find((p) => p.type === "day")?.value;
+      todayISO = `${y}-${m}-${d}`;
+    } catch {
+      todayISO = new Date().toISOString().split("T")[0];
+    }
+
     let actualTodayIdx = -1;
     dayItems.forEach((el, idx) => {
       if (el.dataset.dayDate === todayISO) actualTodayIdx = idx;
@@ -172,66 +190,88 @@ const dateRangeSubtitle = `${startDayNum}–${endDayNum} de ${monthName}`;
       actualTodayIdx !== -1 ? actualTodayIdx : initialIdx;
 
     dayItems.forEach((el, idx) => {
-      const isToday = idx === activeTodayIdx;
+      const isToday = actualTodayIdx !== -1 && idx === actualTodayIdx;
       const tag = el.querySelector("[data-today-indicator]");
       if (tag)
         (tag as HTMLElement).style.display = isToday ? "inline-flex" : "none";
       el.classList.toggle("is-today", isToday);
-      el.open = isToday;
+      el.open = idx === activeTodayIdx;
     });
 
-    // Smooth accordion animation using Motion
+    // Acordeón suave y robusto con Web Animations API nativo
     dayItems.forEach((details) => {
-      const summary = details.querySelector(".schedule-day-summary");
-      const content = details.querySelector(
-        ".schedule-day-content",
-      ) as HTMLElement | null;
+      const summary = details.querySelector(".schedule-day-summary") as HTMLElement | null;
+      const content = details.querySelector(".schedule-day-content") as HTMLElement | null;
       if (!summary || !content) return;
 
       let isAnimating = false;
 
       summary.addEventListener("click", (e) => {
+        e.preventDefault();
+
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          details.open = !details.open;
           return;
         }
 
-        e.preventDefault();
         if (isAnimating) return;
 
         if (details.open) {
           // CERRAR suavemente
           isAnimating = true;
-          const currentH = content.offsetHeight;
+          const startHeight = content.offsetHeight;
           content.style.overflow = "hidden";
 
-          animate(
-            content,
-            { height: [`${currentH}px`, "0px"], opacity: [1, 0] },
-            { duration: 0.22, easing: [0.16, 1, 0.3, 1] },
-          ).finished.then(() => {
+          const anim = content.animate(
+            [
+              { height: `${startHeight}px`, opacity: 1 },
+              { height: "0px", opacity: 0 }
+            ],
+            {
+              duration: 200,
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)"
+            }
+          );
+
+          anim.onfinish = () => {
             details.open = false;
             content.style.height = "";
             content.style.opacity = "";
             content.style.overflow = "";
             isAnimating = false;
-          });
+          };
+
+          anim.oncancel = () => {
+            isAnimating = false;
+          };
         } else {
           // ABRIR suavemente
           details.open = true;
           isAnimating = true;
           content.style.overflow = "hidden";
-          const targetH = content.scrollHeight;
+          const targetHeight = content.scrollHeight;
 
-          animate(
-            content,
-            { height: ["0px", `${targetH}px`], opacity: [0, 1] },
-            { duration: 0.24, easing: [0.16, 1, 0.3, 1] },
-          ).finished.then(() => {
+          const anim = content.animate(
+            [
+              { height: "0px", opacity: 0 },
+              { height: `${targetHeight}px`, opacity: 1 }
+            ],
+            {
+              duration: 220,
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)"
+            }
+          );
+
+          anim.onfinish = () => {
             content.style.height = "";
             content.style.opacity = "";
             content.style.overflow = "";
             isAnimating = false;
-          });
+          };
+
+          anim.oncancel = () => {
+            isAnimating = false;
+          };
         }
       });
     });

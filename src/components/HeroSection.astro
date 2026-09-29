@@ -1,14 +1,13 @@
 ---
-// HeroSection.astro — Hero moderno con jerarquía clara y copy directo
+// HeroSection.astro — Hero moderno con jerarquía clara y estado temporal unificado
+import type { FairState } from "../utils/fairState";
+
 interface Props {
   feriaName: string;
   town: string;
   department: string;
   year: number;
-  startDate: string;
-  endDate: string;
-  currentDayNumber: number;
-  totalDays: number;
+  fairState: FairState;
 }
 
 const {
@@ -16,45 +15,19 @@ const {
   town,
   department,
   year,
-  startDate,
-  endDate,
-  currentDayNumber,
-  totalDays,
+  fairState,
 } = Astro.props;
 
-// ── Estado dinámico según la fecha actual ────────────────────────────────────
-// "before"  → Antes de la feria   → Badge "PRÓXIMAMENTE"
-// "active"  → Durante la feria    → Badge "EN CURSO"
-// "after"   → Feria finalizada    → Badge "FERIA FINALIZADA"
-const todayISO = new Date().toISOString().split("T")[0];
-const startD = new Date(startDate + "T00:00:00");
-const endD = new Date(endDate + "T23:59:59");
-const todayD = new Date(todayISO + "T12:00:00");
-
-type HeroState = "before" | "active" | "after";
-const heroState: HeroState =
-  todayD < startD ? "before" : todayD > endD ? "after" : "active";
-
-// ── Rango de fechas: "5–11 de octubre" (sin duplicar año) ────────────────────
-const fmtDay = (iso: string) =>
-  new Date(iso + "T12:00:00").toLocaleDateString("es-HN", { day: "numeric" });
-const fmtMonthLong = (iso: string) =>
-  new Date(iso + "T12:00:00").toLocaleDateString("es-HN", { month: "long" });
-
-const startDay = fmtDay(startDate);
-const endDay = fmtDay(endDate);
-const monthLabel = fmtMonthLong(startDate); // "octubre"
-
-const dateRange = `${startDay}–${endDay} de ${monthLabel}`;
-const defaultMeta = `${dateRange} · ${town}, ${department}`;
-
-const todayFormatted = todayD.toLocaleDateString("es-HN", {
-  day: "numeric",
-  month: "long",
-});
-const activeMeta = `Hoy · ${todayFormatted} · ${town}, ${department}`;
-
-const heroMetaText = heroState === "active" ? activeMeta : defaultMeta;
+// Meta texto según el estado temporal
+let heroMetaText = "";
+if (fairState.status === "DURING") {
+  heroMetaText = `Hoy · ${fairState.dateFormatted} · ${town}, ${department}`;
+} else if (fairState.status === "AFTER") {
+  heroMetaText = `5–11 de octubre de ${year} · ${town}, ${department}`;
+} else {
+  // BEFORE
+  heroMetaText = `5–11 de octubre · ${town}, ${department}`;
+}
 ---
 
 <section class="hero" aria-label={`Bienvenida a la ${feriaName}`}>
@@ -74,10 +47,10 @@ const heroMetaText = heroState === "active" ? activeMeta : defaultMeta;
 
   <!-- Contenido con jerarquía visual estricta -->
   <div class="hero-content container">
-    <!-- 1. Pequeño indicador superior de estado (sin fechas adentro) -->
+    <!-- 1. Indicador superior de estado -->
     <div class="hero-badge-wrap">
       {
-        heroState === "active" && (
+        fairState.status === "DURING" && (
           <span class="hero-status-badge hero-status-badge--active">
             <span class="badge-dot" aria-hidden="true" />
             EN CURSO
@@ -85,12 +58,12 @@ const heroMetaText = heroState === "active" ? activeMeta : defaultMeta;
         )
       }
       {
-        heroState === "before" && (
+        fairState.status === "BEFORE" && (
           <span class="hero-status-badge">PRÓXIMAMENTE</span>
         )
       }
       {
-        heroState === "after" && (
+        fairState.status === "AFTER" && (
           <span class="hero-status-badge">FERIA FINALIZADA</span>
         )
       }
@@ -101,39 +74,66 @@ const heroMetaText = heroState === "active" ? activeMeta : defaultMeta;
       <p class="hero-pre">FERIA PATRONAL</p>
       <h1 class="hero-title">
         {
-          heroState === "after"
+          fairState.status === "AFTER"
             ? "Gracias por celebrar con nosotros"
             : `${town} está de feria`
         }
       </h1>
     </div>
 
-    <!-- 3. Información clara: fechas y lugar (una sola vez) -->
+    <!-- 3. Información clara: fechas y lugar -->
     <p class="hero-meta">
       {heroMetaText}
     </p>
 
     <!-- 4. Acción principal única -->
     <div class="hero-cta">
-      <a
-        href="#hoy"
-        class="btn-primary hero-btn"
-        aria-label="Ver el programa de actividades de hoy"
-      >
-        <span>Ver programa de hoy</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          class="hero-btn-icon"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M8 2a.75.75 0 0 1 .75.75v8.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.22 3.22V2.75A.75.75 0 0 1 8 2Z"
-            clip-rule="evenodd"></path>
-        </svg>
-      </a>
+      {
+        fairState.status === "DURING" ? (
+          <a
+            href="#hoy"
+            class="btn-primary hero-btn"
+            aria-label="Ver el programa de actividades de hoy"
+          >
+            <span>Ver programa de hoy</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              class="hero-btn-icon"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8 2a.75.75 0 0 1 .75.75v8.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.22 3.22V2.75A.75.75 0 0 1 8 2Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+        ) : (
+          <button
+            type="button"
+            class="btn-primary hero-btn"
+            data-open-schedule
+            aria-label="Ver el programa completo con todos los días de la feria"
+          >
+            <span>Ver programa completo</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              class="hero-btn-icon"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        )
+      }
     </div>
   </div>
 </section>
@@ -142,10 +142,6 @@ const heroMetaText = heroState === "active" ? activeMeta : defaultMeta;
   /* ─── Shell ──────────────────────────────────────── */
   .hero {
     position: relative;
-    /*
-      Mobile-first: 75–85dvh para impacto sin saturar la pantalla.
-      dvh respeta la barra de navegación del navegador en mobile.
-    */
     min-height: clamp(380px, 78dvh, 520px);
     display: flex;
     flex-direction: column;

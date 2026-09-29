@@ -1,131 +1,235 @@
 ---
-// TodaySection.astro — ¿Qué hay hoy?
-// Muestra las actividades del día actual con tarjetas interactivas y acceso directo al programa completo.
+// TodaySection.astro — Sección temporal principal de la Feria
+// Maneja automáticamente los 3 estados: BEFORE, DURING y AFTER según la hora oficial de Honduras.
 import type { FeriaDay } from "../data/feria";
+import type { FairState } from "../utils/fairState";
 
 interface Props {
-  todayDay?: FeriaDay;
+  fairState: FairState;
   days?: FeriaDay[];
-  initialDayIndex?: number;
-  totalDays?: number;
 }
 
-const { todayDay: propTodayDay, days, initialDayIndex = 0 } = Astro.props;
+const { fairState, days } = Astro.props;
 
-// Determinar el día de hoy
-const todayDay = propTodayDay ?? (days ? days[initialDayIndex] : undefined);
+// Durante la feria: día actual y conteo de actividades
+const todayDay = fairState.currentDay ?? (days ? days[fairState.currentDayIndex] : undefined);
+const activityCount = todayDay?.activities.length ?? 0;
+const activityCountText = `${activityCount} ${activityCount === 1 ? "actividad" : "actividades"}`;
+const fullDateTitle = fairState.dateFormatted; // "Martes 6 de octubre"
 
-if (!todayDay) {
-  throw new Error("TodaySection requires a valid todayDay or days array.");
-}
-
-// Formatear la fecha en español: "Martes 6 de octubre"
-const d = new Date(todayDay.date + "T12:00:00");
-const weekdayLong = d.toLocaleDateString("es-HN", { weekday: "long" });
-const weekdayCap = weekdayLong.charAt(0).toUpperCase() + weekdayLong.slice(1);
-const dayNumber = d.getDate();
-const monthName = d.toLocaleDateString("es-HN", { month: "long" });
-const fullDateTitle = `${weekdayCap} ${dayNumber} de ${monthName}`;
-const activityCountText = `${todayDay.activities.length} ${todayDay.activities.length === 1 ? "actividad" : "actividades"}`;
+// Días restantes antes de la feria
+const daysUntil = fairState.daysUntil ?? 1;
+const daysUntilText = daysUntil === 1 ? "Falta 1 día" : `Faltan ${daysUntil} días`;
 ---
 
-<section id="hoy" class="today-section" aria-label="¿Qué hay hoy?">
+<section id="hoy" class="today-section" aria-label={fairState.status === "DURING" ? "¿Qué hay hoy?" : "Estado de la feria"}>
   <div class="container">
 
-    <!-- ── Encabezado ─────────────────────────────── -->
-    <header class="today-header">
-      <p class="today-eyebrow">¿QUÉ HAY HOY?</p>
-      <h2 class="today-title">{fullDateTitle}</h2>
-      <p class="today-count">{activityCountText}</p>
-    </header>
+    {/* ══════════════════════════════════════════════════════════════
+        ESTADO: DURING (Durante la Feria)
+        ══════════════════════════════════════════════════════════════ */}
+    {fairState.status === "DURING" && todayDay && (
+      <>
+        <!-- Encabezado de Hoy -->
+        <header class="today-header">
+          <p class="today-eyebrow">¿QUÉ HAY HOY?</p>
+          <h2 class="today-title">{fullDateTitle}</h2>
+          <p class="today-count">{activityCountText}</p>
+        </header>
 
-    <!-- ── Lista de Actividades de Hoy ───────────── -->
-    <div class="today-list" role="list" aria-label={`Actividades del ${fullDateTitle}`}>
-      {todayDay.activities.map((act) => (
-        <div role="listitem">
+        <!-- Lista interactiva de Actividades de Hoy -->
+        <div class="today-list" role="list" aria-label={`Actividades del ${fullDateTitle}`}>
+          {todayDay.activities.map((act) => (
+            <div role="listitem">
+              <button
+                type="button"
+                class="today-act-card"
+                data-open-activity
+                data-title={act.title}
+                data-time={act.time}
+                data-date={fullDateTitle}
+                data-location={act.location}
+                data-category={act.category}
+                data-description={act.description ?? ""}
+                data-maps-url={act.mapsUrl ?? ""}
+                aria-label={`Ver detalles de ${act.title}, a las ${act.time} en ${act.location}`}
+              >
+                <!-- Columna de Hora -->
+                <div class="act-time-col">
+                  <span class="act-time">{act.time}</span>
+                </div>
+
+                <!-- Información principal -->
+                <div class="act-body">
+                  <h3 class="act-title">{act.title}</h3>
+                  <p class="act-location">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      class="loc-pin-icon"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.541l.062.029.018-.008.006-.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                    <span>{act.location}</span>
+                  </p>
+                </div>
+
+                <!-- Chevron interactivo -->
+                <div class="act-arrow-col" aria-hidden="true">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    class="chevron-icon"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </div>
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <!-- Acceso al Programa Completo -->
+        <div class="today-cta-wrap">
           <button
             type="button"
-            class="today-act-card"
-            data-open-activity
-            data-title={act.title}
-            data-time={act.time}
-            data-date={fullDateTitle}
-            data-location={act.location}
-            data-category={act.category}
-            data-description={act.description ?? ""}
-            data-maps-url={act.mapsUrl ?? ""}
-            aria-label={`Ver detalles de ${act.title}, a las ${act.time} en ${act.location}`}
+            class="btn-full-schedule"
+            data-open-schedule
+            aria-label="Ver el programa completo con todos los días de la feria"
           >
-            <!-- Columna de Hora -->
-            <div class="act-time-col">
-              <span class="act-time">{act.time}</span>
-            </div>
-
-            <!-- Información principal -->
-            <div class="act-body">
-              <h3 class="act-title">{act.title}</h3>
-              <p class="act-location">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  class="loc-pin-icon"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.541l.062.029.018-.008.006-.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <span>{act.location}</span>
-              </p>
-            </div>
-
-            <!-- Chevron interactivo -->
-            <div class="act-arrow-col" aria-hidden="true">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                class="chevron-icon"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
+            <span>Ver programa completo</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              class="cta-arrow"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z"
+                clip-rule="evenodd"
+              />
+            </svg>
           </button>
         </div>
-      ))}
-    </div>
+      </>
+    )}
 
-    <!-- ── Acceso al Programa Completo ───────────── -->
-    <div class="today-cta-wrap">
-      <button
-        type="button"
-        class="btn-full-schedule"
-        data-open-schedule
-        aria-label="Ver el programa completo con todos los días de la feria"
-      >
-        <span>Ver programa completo</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
-          class="cta-arrow"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z"
-            clip-rule="evenodd"
-          />
-        </svg>
-      </button>
-    </div>
+    {/* ══════════════════════════════════════════════════════════════
+        ESTADO: BEFORE (Antes de la Feria)
+        ══════════════════════════════════════════════════════════════ */}
+    {fairState.status === "BEFORE" && (
+      <div class="state-card state-card--before">
+        <header class="state-header">
+          <p class="today-eyebrow">LA FERIA COMIENZA PRONTO</p>
+          <h2 class="today-title">La feria comienza pronto</h2>
+          <div class="state-badge-row">
+            <span class="state-date-tag">5 de octubre de 2026</span>
+            <span class="state-countdown-badge">{daysUntilText}</span>
+          </div>
+          <p class="state-desc">
+            Conoce el programa de actividades de la Feria Patronal de Belén.
+          </p>
+        </header>
+
+        <div class="today-cta-wrap today-cta-wrap--center">
+          <button
+            type="button"
+            class="btn-full-schedule"
+            data-open-schedule
+            aria-label="Ver el programa completo con todos los días de la feria"
+          >
+            <span>Ver programa completo</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              class="cta-arrow"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    )}
+
+    {/* ══════════════════════════════════════════════════════════════
+        ESTADO: AFTER (Feria Finalizada)
+        ══════════════════════════════════════════════════════════════ */}
+    {fairState.status === "AFTER" && (
+      <div class="state-card state-card--after">
+        <header class="state-header">
+          <p class="today-eyebrow">FERIA FINALIZADA</p>
+          <h2 class="today-title">La feria ha terminado</h2>
+          <p class="state-date-tag">5–11 de octubre de 2026</p>
+          <p class="state-desc">
+            Gracias por celebrar con nosotros. Puedes consultar el programa de lo que se vivió en la feria o explorar los recuerdos del pueblo.
+          </p>
+        </header>
+
+        <div class="state-buttons-grid">
+          <button
+            type="button"
+            class="btn-full-schedule"
+            data-open-schedule
+            aria-label="Ver el programa completo de la feria"
+          >
+            <span>Ver programa completo</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              class="cta-arrow"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+
+          <a
+            href="#asi-se-vive"
+            class="btn-full-schedule btn-full-schedule--secondary"
+            aria-label="Ver fotos y recuerdos de Así se vive Belén"
+          >
+            <span>Así se vive Belén</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              class="cta-arrow"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+    )}
 
   </div>
 </section>
@@ -292,9 +396,79 @@ const activityCountText = `${todayDay.activities.length} ${todayDay.activities.l
     color: var(--color-accent);
   }
 
+  /* ─── Estructura de Tarjetas para BEFORE y AFTER ──── */
+  .state-card {
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .state-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .state-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+    margin-top: 0.25rem;
+  }
+
+  .state-date-tag {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    margin: 0;
+  }
+
+  .state-countdown-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    background-color: rgba(240, 90, 22, 0.12);
+    color: var(--color-accent);
+    padding: 0.25rem 0.625rem;
+    border-radius: 4px;
+  }
+
+  .state-desc {
+    font-size: 0.9375rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+    margin: 0.25rem 0 0;
+  }
+
+  .state-buttons-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 640px) {
+    .state-buttons-grid {
+      flex-direction: row;
+      gap: 1rem;
+    }
+  }
+
   /* ─── CTA "Ver programa completo →" ──────────────── */
   .today-cta-wrap {
     margin-top: 1.25rem;
+  }
+
+  .today-cta-wrap--center {
+    margin-top: 0;
   }
 
   .btn-full-schedule {
@@ -312,6 +486,7 @@ const activityCountText = `${todayDay.activities.length} ${todayDay.activities.l
     font-size: 0.9375rem;
     font-weight: 700;
     color: var(--color-ink);
+    text-decoration: none;
     cursor: pointer;
     transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
     letter-spacing: -0.01em;
@@ -325,6 +500,14 @@ const activityCountText = `${todayDay.activities.length} ${todayDay.activities.l
 
   .btn-full-schedule:active {
     transform: scale(0.985);
+  }
+
+  .btn-full-schedule--secondary {
+    background-color: #F9FAFB;
+  }
+
+  .btn-full-schedule--secondary:hover {
+    background-color: #F3F4F6;
   }
 
   .cta-arrow {
@@ -355,7 +538,11 @@ const activityCountText = `${todayDay.activities.length} ${todayDay.activities.l
 
     .btn-full-schedule {
       width: auto;
-      min-width: 260px;
+      min-width: 240px;
+    }
+
+    .state-card {
+      padding: 2.5rem 2rem;
     }
   }
 
