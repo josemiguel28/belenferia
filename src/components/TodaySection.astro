@@ -1,799 +1,370 @@
 ---
 // TodaySection.astro — ¿Qué hay hoy?
-// Renderiza los 7 días; JS muestra el día correcto y gestiona la navegación.
-import type { FeriaDay, Activity } from "../data/feria";
+// Muestra las actividades del día actual con tarjetas interactivas y acceso directo al programa completo.
+import type { FeriaDay } from "../data/feria";
 
 interface Props {
-  days: FeriaDay[];          // todos los días de la feria
-  initialDayIndex: number;   // índice calculado en el servidor (fallback si JS falla)
-  totalDays: number;
+  todayDay?: FeriaDay;
+  days?: FeriaDay[];
+  initialDayIndex?: number;
+  totalDays?: number;
 }
 
-const { days, initialDayIndex, totalDays } = Astro.props;
+const { todayDay: propTodayDay, days, initialDayIndex = 0 } = Astro.props;
 
-// ── Pre-computar info de display por día (server-side) ───────────────────────
-const CAT_LABELS: Record<string, string> = {
-  cultural: "Cultural", religioso: "Religioso", musical: "Musical",
-  deportivo: "Deportivo", tradicional: "Tradicional", desfile: "Desfile",
-  gastronomico: "Gastronómico",
-};
+// Determinar el día de hoy
+const todayDay = propTodayDay ?? (days ? days[initialDayIndex] : undefined);
 
-interface DayDisplay {
-  weekdayLong: string;   // "Martes"
-  weekdayShort: string;  // "Mar"
-  monthName: string;     // "octubre"
-  featured: Activity;
-  secondary: Activity[];
+if (!todayDay) {
+  throw new Error("TodaySection requires a valid todayDay or days array.");
 }
 
-const dayDisplays: DayDisplay[] = days.map((day) => {
-  const d = new Date(day.date + "T12:00:00");
-  const wdLong  = d.toLocaleDateString("es-HN", { weekday: "long" });
-  const wdShort = d.toLocaleDateString("es-HN", { weekday: "short" }).replace(".", "");
-  const month   = d.toLocaleDateString("es-HN", { month: "long" });
-  const featured = day.activities.find((a) => a.featured) ?? day.activities[0];
-  const secondary = day.activities.filter((a) => a !== featured);
-  return {
-    weekdayLong:  wdLong.charAt(0).toUpperCase() + wdLong.slice(1),
-    weekdayShort: wdShort.charAt(0).toUpperCase() + wdShort.slice(1),
-    monthName:    month,
-    featured,
-    secondary,
-  };
-});
-
-// Pasamos los datos de navegación (fechas) al cliente como JSON
-const navData = days.map((d, i) => ({
-  date:  d.date,
-  label: dayDisplays[i].weekdayShort + " " + d.dayNumber, // "Mar 6"
-}));
+// Formatear la fecha en español: "Martes 6 de octubre"
+const d = new Date(todayDay.date + "T12:00:00");
+const weekdayLong = d.toLocaleDateString("es-HN", { weekday: "long" });
+const weekdayCap = weekdayLong.charAt(0).toUpperCase() + weekdayLong.slice(1);
+const dayNumber = d.getDate();
+const monthName = d.toLocaleDateString("es-HN", { month: "long" });
+const fullDateTitle = `${weekdayCap} ${dayNumber} de ${monthName}`;
+const activityCountText = `${todayDay.activities.length} ${todayDay.activities.length === 1 ? "actividad" : "actividades"}`;
 ---
 
-<section id="hoy" class="today-section" aria-label="Actividades de hoy">
+<section id="hoy" class="today-section" aria-label="¿Qué hay hoy?">
   <div class="container">
 
-    <!-- ── Navegación entre días ──────────────────── -->
-    <div class="day-nav" id="day-nav" aria-label="Navegación entre días">
-      <button
-        class="day-nav-arrow"
-        id="day-prev"
-        aria-label="Día anterior"
-        type="button"
-        disabled
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="nav-arrow-icon" aria-hidden="true">
-          <path fill-rule="evenodd" d="M9.78 4.22a.75.75 0 0 1 0 1.06L7.06 8l2.72 2.72a.75.75 0 1 1-1.06 1.06L5.47 8.53a.75.75 0 0 1 0-1.06l3.25-3.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/>
-        </svg>
-        <span class="day-nav-prev-label" id="prev-label">—</span>
-      </button>
+    <!-- ── Encabezado ─────────────────────────────── -->
+    <header class="today-header">
+      <p class="today-eyebrow">¿QUÉ HAY HOY?</p>
+      <h2 class="today-title">{fullDateTitle}</h2>
+      <p class="today-count">{activityCountText}</p>
+    </header>
 
-      <div class="day-nav-center" aria-live="polite" aria-atomic="true">
-        <span class="day-nav-today-tag" id="today-tag">HOY</span>
-        <span class="day-nav-current-label" id="current-label">—</span>
-        <button
-          type="button"
-          class="day-nav-return-btn"
-          id="btn-return-today"
-          style="display: none;"
-          aria-label="Regresar al día de hoy"
+    <!-- ── Lista de Actividades de Hoy ───────────── -->
+    <div class="today-list" role="list" aria-label={`Actividades del ${fullDateTitle}`}>
+      {todayDay.activities.map((act) => (
+        <div role="listitem">
+          <button
+            type="button"
+            class="today-act-card"
+            data-open-activity
+            data-title={act.title}
+            data-time={act.time}
+            data-date={fullDateTitle}
+            data-location={act.location}
+            data-category={act.category}
+            data-description={act.description ?? ""}
+            data-maps-url={act.mapsUrl ?? ""}
+            aria-label={`Ver detalles de ${act.title}, a las ${act.time} en ${act.location}`}
+          >
+            <!-- Columna de Hora -->
+            <div class="act-time-col">
+              <span class="act-time">{act.time}</span>
+            </div>
+
+            <!-- Información principal -->
+            <div class="act-body">
+              <h3 class="act-title">{act.title}</h3>
+              <p class="act-location">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  class="loc-pin-icon"
+                  aria-hidden="true"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.541l.062.029.018-.008.006-.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <span>{act.location}</span>
+              </p>
+            </div>
+
+            <!-- Chevron interactivo -->
+            <div class="act-arrow-col" aria-hidden="true">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                class="chevron-icon"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </div>
+          </button>
+        </div>
+      ))}
+    </div>
+
+    <!-- ── Acceso al Programa Completo ───────────── -->
+    <div class="today-cta-wrap">
+      <button
+        type="button"
+        class="btn-full-schedule"
+        data-open-schedule
+        aria-label="Ver el programa completo con todos los días de la feria"
+      >
+        <span>Ver programa completo</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          class="cta-arrow"
+          aria-hidden="true"
         >
-          Volver a HOY
-        </button>
-      </div>
-
-      <button
-        class="day-nav-arrow day-nav-arrow--right"
-        id="day-next"
-        aria-label="Día siguiente"
-        type="button"
-      >
-        <span class="day-nav-next-label" id="next-label">—</span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="nav-arrow-icon" aria-hidden="true">
-          <path fill-rule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/>
+          <path
+            fill-rule="evenodd"
+            d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z"
+            clip-rule="evenodd"
+          />
         </svg>
       </button>
     </div>
 
-    <!-- ── Paneles de cada día (todos renderizados, JS muestra uno) ── -->
-    {days.map((day, i) => {
-      const dd = dayDisplays[i];
-      const ordinal = i + 1;
-      return (
-        <div
-          class="day-panel"
-          id={`day-panel-${i}`}
-          data-day-index={i}
-          data-day-date={day.date}
-          hidden={i !== initialDayIndex}
-        >
-          <!-- Cabecera del día -->
-          <div class="today-header">
-            <div class="today-header-left">
-              <p class="section-eyebrow day-panel-eyebrow" id={`panel-eyebrow-${i}`}>{i === initialDayIndex ? "¿Qué hay hoy?" : "Actividades del día"}</p>
-              <p class="today-day-sub">Día {ordinal} de {totalDays}</p>
-            </div>
-            <div
-              class="today-date-block"
-              aria-label={`${dd.weekdayLong} ${day.dayNumber} de ${dd.monthName}`}
-            >
-              <span class="today-weekday">{dd.weekdayLong}</span>
-              <span class="today-number">{day.dayNumber}</span>
-              <span class="today-month">{dd.monthName}</span>
-            </div>
-          </div>
-
-          <!-- Actividad destacada -->
-          <div class="featured-wrap">
-            {dd.featured.image ? (
-              <article
-                class="featured-card featured-card--photo"
-                aria-label={`Actividad destacada: ${dd.featured.title}`}
-              >
-                <div class="featured-img-wrap">
-                  <img
-                    src={dd.featured.image}
-                    alt={dd.featured.title}
-                    class="featured-img"
-                    loading={i === initialDayIndex ? "eager" : "lazy"}
-                    width="800"
-                    height="534"
-                  />
-                  <span class="featured-cat-tag">{CAT_LABELS[dd.featured.category] ?? dd.featured.category}</span>
-                </div>
-                <div class="featured-body">
-                  <p class="featured-time">{dd.featured.time}</p>
-                  <h2 class="featured-title">{dd.featured.title}</h2>
-                  <p class="featured-location">
-                    <svg class="loc-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M8 1.5A4.5 4.5 0 0 0 3.5 6c0 2.29 1.7 4.716 4.5 7.5C10.8 10.716 12.5 8.29 12.5 6A4.5 4.5 0 0 0 8 1.5ZM8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z" clip-rule="evenodd"/>
-                    </svg>
-                    {dd.featured.location}
-                  </p>
-                </div>
-              </article>
-            ) : (
-              <article
-                class="featured-card featured-card--editorial"
-                aria-label={`Actividad destacada: ${dd.featured.title}`}
-              >
-                <div class="featured-editorial-time">{dd.featured.time}</div>
-                <div class="featured-editorial-body">
-                  <p class="featured-editorial-cat">{CAT_LABELS[dd.featured.category] ?? dd.featured.category}</p>
-                  <h2 class="featured-editorial-title">{dd.featured.title}</h2>
-                  <p class="featured-location featured-editorial-loc">
-                    <svg class="loc-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M8 1.5A4.5 4.5 0 0 0 3.5 6c0 2.29 1.7 4.716 4.5 7.5C10.8 10.716 12.5 8.29 12.5 6A4.5 4.5 0 0 0 8 1.5ZM8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z" clip-rule="evenodd"/>
-                    </svg>
-                    {dd.featured.location}
-                  </p>
-                </div>
-              </article>
-            )}
-          </div>
-
-          <!-- Lista compacta de las demás actividades -->
-          {dd.secondary.length > 0 && (
-            <div class="secondary-activities" role="list" aria-label="Otras actividades del día">
-              {dd.secondary.map((act) => (
-                <div class="secondary-row" role="listitem">
-                  <span class="secondary-time">{act.time}</span>
-                  <div class="secondary-body">
-                    <span class="secondary-title">{act.title}</span>
-                    <span class="secondary-loc">
-                      <svg class="loc-icon-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M8 1.5A4.5 4.5 0 0 0 3.5 6c0 2.29 1.7 4.716 4.5 7.5C10.8 10.716 12.5 8.29 12.5 6A4.5 4.5 0 0 0 8 1.5ZM8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z" clip-rule="evenodd"/>
-                      </svg>
-                      {act.location}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <!-- Enlace secundario al programa completo 
-          <div class="see-all-wrap">
-            <button type="button" class="see-all-link" data-open-schedule>
-              Ver programa completo
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="see-all-icon" aria-hidden="true">
-                <path fill-rule="evenodd" d="M8 2a.75.75 0 0 1 .75.75v8.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.22 3.22V2.75A.75.75 0 0 1 8 2Z" clip-rule="evenodd"/>
-              </svg>
-            </button>
-          </div>
--->
-        </div>
-      );
-    })}
-
   </div>
 </section>
 
-<!--
-  ─── Script de navegación ──────────────────────────────────────────────────
--->
-<script define:vars={{ navData, initialDayIndex }}>
-  const DAYS = navData;  // [{ date, label }]
-  const TOTAL = DAYS.length;
-
-  // Determinar índice del día actual (fecha real del dispositivo)
-  const todayISO = new Date().toISOString().split("T")[0];
-  const todayIdx = DAYS.findIndex((d) => d.date === todayISO);
-
-  let calendarTodayIdx = todayIdx !== -1 ? todayIdx : initialDayIndex;
-  let activeIdx = calendarTodayIdx;
-
-  // Referencias DOM
-  const btnPrev       = document.getElementById("day-prev");
-  const btnNext       = document.getElementById("day-next");
-  const prevLabel     = document.getElementById("prev-label");
-  const nextLabel     = document.getElementById("next-label");
-  const currentLbl    = document.getElementById("current-label");
-  const todayTag      = document.getElementById("today-tag");
-  const btnReturnToday = document.getElementById("btn-return-today");
-  const panels        = Array.from(document.querySelectorAll(".day-panel"));
-
-  function showDay(idx) {
-    panels.forEach((p, i) => {
-      if (i === idx) {
-        p.hidden = false;
-        p.style.animation = "none";
-        void p.offsetHeight;
-        p.style.animation = "";
-      } else {
-        p.hidden = true;
-      }
-    });
-
-    const hasPrev = idx > 0;
-    const hasNext = idx < TOTAL - 1;
-
-    btnPrev.disabled = !hasPrev;
-    btnNext.disabled = !hasNext;
-
-    prevLabel.textContent = hasPrev ? DAYS[idx - 1].label : "";
-    nextLabel.textContent = hasNext ? DAYS[idx + 1].label : "";
-    currentLbl.textContent = DAYS[idx].label;
-
-    const isCalendarToday = idx === calendarTodayIdx;
-    if (isCalendarToday) {
-      todayTag.style.display = "inline-flex";
-      btnReturnToday.style.display = "none";
-    } else {
-      todayTag.style.display = "none";
-      btnReturnToday.style.display = "inline-flex";
-      btnReturnToday.textContent = `Ir a HOY (${DAYS[calendarTodayIdx].label})`;
-    }
-
-    // Actualizar eyebrow del panel
-    const eyebrow = document.getElementById(`panel-eyebrow-${idx}`);
-    if (eyebrow) {
-      eyebrow.textContent = isCalendarToday ? "¿Qué hay hoy?" : "Actividades del día";
-    }
-
-    activeIdx = idx;
-  }
-
-  btnPrev.addEventListener("click", () => {
-    if (activeIdx > 0) showDay(activeIdx - 1);
-  });
-
-  btnNext.addEventListener("click", () => {
-    if (activeIdx < TOTAL - 1) showDay(activeIdx + 1);
-  });
-
-  btnReturnToday.addEventListener("click", () => {
-    showDay(calendarTodayIdx);
-  });
-
-  // ─── Swipe support para la navegación (mobile) ────────────────────────────
-  // Detectar swipe horizontal sobre la sección de hoy
-  const section = document.getElementById("hoy");
-  let touchStartX = 0;
-
-  section.addEventListener("touchstart", (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-  }, { passive: true });
-
-  section.addEventListener("touchend", (e) => {
-    const dx = e.changedTouches[0].screenX - touchStartX;
-    if (Math.abs(dx) < 50) return; // umbral mínimo 50px
-    if (dx < 0 && activeIdx < TOTAL - 1) showDay(activeIdx + 1); // swipe left → next
-    if (dx > 0 && activeIdx > 0)         showDay(activeIdx - 1); // swipe right → prev
-  }, { passive: true });
-
-  // ─── Inicializar ───────────────────────────────────────────────────────────
-  showDay(activeIdx);
-</script>
-
 <style>
+  /* ─── Sección ────────────────────────────────────── */
   .today-section {
     background-color: var(--color-bg);
-    padding-block: 0 3rem;
+    padding-block: 2.5rem 2.5rem;
   }
 
-  /* ─── Navegación de días ─────────────────────────── */
-  .day-nav {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    border-bottom: 1px solid var(--color-border);
-    margin-bottom: 0;
-  }
-
-  .day-nav-arrow {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.875rem 0;
-    min-height: 48px;
-    font-family: var(--font-body);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--color-muted);
-    transition: color 0.15s ease, transform 0.12s ease;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  .day-nav-arrow:not(:disabled):hover {
-    color: var(--color-accent);
-  }
-
-  .day-nav-arrow:not(:disabled):active {
-    transform: scale(0.96);
-  }
-
-  .day-nav-arrow:disabled {
-    opacity: 0.25;
-    cursor: default;
-  }
-
-  .day-nav-arrow--right {
-    margin-left: auto;
-  }
-
-  .nav-arrow-icon {
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
-  }
-
-  .day-nav-center {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    padding: 0 0.25rem;
-  }
-
-  .day-nav-today-tag {
-    font-family: var(--font-body);
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #fff;
-    background: var(--color-accent);
-    padding: 0.2em 0.5em;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
-
-  .day-nav-current-label {
-    font-family: var(--font-body);
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--color-ink);
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-  }
-
-  .day-nav-return-btn {
-    font-family: var(--font-body);
-    font-size: 0.6875rem;
-    font-weight: 700;
-    color: var(--color-accent);
-    background: rgba(240, 90, 22, 0.1);
-    border: 1px solid rgba(240, 90, 22, 0.25);
-    padding: 0.2em 0.55em;
-    border-radius: 4px;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
-    white-space: nowrap;
-  }
-
-  .day-nav-return-btn:hover {
-    background: var(--color-accent);
-    color: #FFFFFF;
-  }
-
-  .day-nav-return-btn:active {
-    transform: scale(0.96);
-  }
-
-  /* ─── Panel de día ───────────────────────────────── */
-  .day-panel {
-    padding-top: 1.5rem;
-  }
-
-  .day-panel:not([hidden]) {
-    animation: day-fade-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  @keyframes day-fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* ─── Cabecera del día ───────────────────────────── */
+  /* ─── Encabezado ─────────────────────────────────── */
   .today-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
   }
 
-  .today-header-left {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    padding-top: 0.25rem;
-  }
-
-  .section-eyebrow {
+  .today-eyebrow {
     font-family: var(--font-body);
     font-size: 0.6875rem;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-muted);
-    margin: 0;
+    color: var(--color-accent);
+    margin: 0 0 0.35rem;
   }
 
-  .today-day-sub {
+  .today-title {
     font-family: var(--font-body);
-    font-size: 0.8125rem;
+    font-size: clamp(1.75rem, 6.5vw, 2.25rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    color: var(--color-ink);
+    margin: 0 0 0.35rem;
+  }
+
+  .today-count {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-muted);
     margin: 0;
   }
 
-  .today-date-block {
+  /* ─── Lista de Actividades ───────────────────────── */
+  .today-list {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    flex-shrink: 0;
-    line-height: 1;
-    gap: 0.1rem;
-  }
-
-  .today-weekday {
-    font-family: var(--font-body);
-    font-size: clamp(1.25rem, 5vw, 1.625rem);
-    font-weight: 700;
-    color: var(--color-ink);
-    letter-spacing: -0.02em;
-  }
-
-  .today-number {
-    font-family: var(--font-body);
-    font-size: clamp(2.25rem, 9vw, 3.5rem);
-    font-weight: 800;
-    line-height: 0.95;
-    color: var(--color-ink);
-    letter-spacing: -0.04em;
-  }
-
-  .today-month {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-muted);
-    text-transform: capitalize;
-    letter-spacing: 0.02em;
-  }
-
-  /* ─── Featured: con foto ─────────────────────────── */
-  .featured-wrap {
-    margin-bottom: 0;
-  }
-
-  .featured-card {
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--color-surface);
-  }
-
-  .featured-card--photo {
     border: 1px solid var(--color-border);
-  }
-
-  .featured-img-wrap {
-    position: relative;
-    aspect-ratio: 16 / 9;
+    border-radius: 12px;
     overflow: hidden;
+    background: #FFFFFF;
   }
 
-  .featured-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: scale 0.4s ease;
-  }
-
-  .featured-card:hover .featured-img {
-    scale: 1.03;
-  }
-
-  .featured-cat-tag {
-    position: absolute;
-    top: 0.75rem;
-    left: 0.75rem;
-    background: var(--color-accent);
-    color: #fff;
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.2em 0.625em;
-    border-radius: 3px;
-  }
-
-  .featured-body {
-    padding: 0.875rem 1rem 1.125rem;
-  }
-
-  .featured-time {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--color-accent);
-    margin: 0 0 0.3rem;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-  }
-
-  .featured-title {
-    font-family: var(--font-body);
-    font-size: clamp(1.125rem, 4.5vw, 1.375rem);
-    font-weight: 700;
-    line-height: 1.3;
-    letter-spacing: -0.015em;
-    color: var(--color-ink);
-    margin: 0 0 0.45rem;
-  }
-
-  .featured-location {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.8125rem;
-    color: var(--color-muted);
-    margin: 0;
-  }
-
-  .loc-icon {
-    width: 0.75rem;
-    height: 0.75rem;
-    flex-shrink: 0;
-    opacity: 0.55;
-  }
-
-  /* ─── Featured: editorial (sin foto) ────────────── */
-  .featured-card--editorial {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    display: flex;
-    align-items: stretch;
-    min-height: 148px;
-  }
-
-  .featured-editorial-time {
-    font-family: var(--font-body);
-    font-size: 0.8125rem;
-    font-weight: 700;
-    color: var(--color-accent);
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    transform: rotate(180deg);
-    padding: 1rem 0.875rem;
-    background: var(--color-bg);
-    border-right: 1px solid var(--color-border);
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-  }
-
-  .featured-editorial-body {
-    flex: 1;
-    padding: 1.125rem 1.125rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.3rem;
-  }
-
-  .featured-editorial-cat {
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-    margin: 0;
-  }
-
-  .featured-editorial-title {
-    font-family: var(--font-body);
-    font-size: clamp(1.125rem, 4.5vw, 1.375rem);
-    font-weight: 700;
-    line-height: 1.3;
-    letter-spacing: -0.015em;
-    color: var(--color-ink);
-    margin: 0;
-  }
-
-  .featured-editorial-loc {
-    color: var(--color-muted);
-  }
-
-  .featured-editorial-loc .loc-icon {
-    color: var(--color-muted);
-  }
-
-  /* ─── Lista secundaria ───────────────────────────── */
-  .secondary-activities {
-    margin-top: 0.375rem;
+  .today-list > div + div {
     border-top: 1px solid var(--color-border);
   }
 
-  .secondary-row {
+  /* ─── Fila / Tarjeta Interactiva ─────────────────── */
+  .today-act-card {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 0.875rem;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid var(--color-border);
-    min-height: 44px;
+    width: 100%;
+    padding: 1rem 1.125rem;
+    min-height: 64px;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: inherit;
+    transition: background-color 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .secondary-time {
-    font-size: 0.75rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: var(--color-accent);
-    white-space: nowrap;
+  .today-act-card:hover {
+    background-color: #F8F9FA;
+  }
+
+  .today-act-card:active {
+    background-color: #F1F3F5;
+  }
+
+  .today-act-card:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  /* ─── Columna de Hora ────────────────────────────── */
+  .act-time-col {
     flex-shrink: 0;
     width: 4.5rem;
-    text-align: right;
+    text-align: left;
   }
 
-  .secondary-body {
+  .act-time {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    color: var(--color-accent);
+    line-height: 1.2;
+    display: inline-block;
+  }
+
+  /* ─── Cuerpo de la Actividad ─────────────────────── */
+  .act-body {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 0.2rem;
   }
 
-  .secondary-title {
+  .act-title {
+    font-family: var(--font-body);
     font-size: 0.9375rem;
-    font-weight: 600;
+    font-weight: 700;
+    line-height: 1.35;
     color: var(--color-ink);
-    line-height: 1.3;
+    margin: 0;
+    word-break: break-word;
   }
 
-  .secondary-loc {
+  .act-location {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.35rem;
+    font-family: var(--font-body);
     font-size: 0.75rem;
     color: var(--color-muted);
-    line-height: 1.4;
+    line-height: 1.3;
+    margin: 0;
   }
 
-  .loc-icon-sm {
-    width: 0.6875rem;
-    height: 0.6875rem;
+  .loc-pin-icon {
+    width: 0.875rem;
+    height: 0.875rem;
     flex-shrink: 0;
-    opacity: 0.45;
-  }
-
-  /* ─── "Ver programa completo" ────────────────────── */
-  .see-all-wrap {
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--color-border);
-    margin-top: 0;
-  }
-
-  .see-all-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-family: var(--font-body);
-    font-size: 0.8125rem;
-    font-weight: 600;
     color: var(--color-muted);
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    transition: color 0.15s ease;
-    min-height: 36px;
-    padding: 0.25rem 0;
+    opacity: 0.75;
   }
 
-  .see-all-link:hover {
+  /* ─── Chevron ────────────────────────────────────── */
+  .act-arrow-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #9CA3AF;
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+
+  .chevron-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  .today-act-card:hover .act-arrow-col {
+    transform: translateX(2px);
     color: var(--color-accent);
   }
 
-  .see-all-icon {
-    width: 0.75rem;
-    height: 0.75rem;
-    flex-shrink: 0;
+  /* ─── CTA "Ver programa completo →" ──────────────── */
+  .today-cta-wrap {
+    margin-top: 1.25rem;
   }
 
-  /* ─── Responsive ─────────────────────────────────── */
+  .btn-full-schedule {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 50px;
+    padding: 0.875rem 1.25rem;
+    background-color: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+    letter-spacing: -0.01em;
+  }
+
+  .btn-full-schedule:hover {
+    border-color: #D1D5DB;
+    background-color: #F9FAFB;
+    color: var(--color-accent);
+  }
+
+  .btn-full-schedule:active {
+    transform: scale(0.985);
+  }
+
+  .cta-arrow {
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-accent);
+    flex-shrink: 0;
+    transition: transform 0.15s ease;
+  }
+
+  .btn-full-schedule:hover .cta-arrow {
+    transform: translateX(3px);
+  }
+
+  /* ─── Desktop (>= 640px) ─────────────────────────── */
   @media (min-width: 640px) {
     .today-section {
-      padding-bottom: 3.5rem;
+      padding-block: 3.5rem 3rem;
     }
 
-    .featured-title {
-      font-size: 1.75rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    /* En desktop, el panel de hoy puede ir a 2 columnas:
-       featured (izq) + lista secundaria (der) */
-    .day-panel {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto auto;
-      gap: 0 2rem;
-      align-items: start;
+    .act-time-col {
+      width: 5.5rem;
     }
 
-    .today-header {
-      grid-column: 1 / -1;
+    .act-title {
+      font-size: 1rem;
     }
 
-    .featured-wrap {
-      grid-column: 1;
-    }
-
-    .secondary-activities {
-      grid-column: 2;
-      margin-top: 0;
-      border-top: none;
-    }
-
-    .see-all-wrap {
-      grid-column: 1 / -1;
+    .btn-full-schedule {
+      width: auto;
+      min-width: 260px;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .day-panel:not([hidden]) {
-      animation: none !important;
-      transform: none !important;
-      opacity: 1 !important;
-    }
-    .day-nav-arrow,
-    .day-nav-return-btn {
+    .today-act-card,
+    .btn-full-schedule,
+    .act-arrow-col,
+    .cta-arrow {
+      transition: none !important;
       transform: none !important;
     }
   }

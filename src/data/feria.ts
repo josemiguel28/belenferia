@@ -81,7 +81,6 @@ export const feria: FeriaInfo = {
           location: "Plaza Municipal",
           category: "musical",
           featured: true,
-          image: "/images/activity-concursocoros.png",
         },
         {
           time: "10:00 PM",
@@ -133,7 +132,6 @@ export const feria: FeriaInfo = {
           location: "Plaza Municipal",
           category: "musical",
           featured: true,
-          image: "/images/activity-concursocoros.png",
         },
       ],
     },
@@ -155,8 +153,6 @@ export const feria: FeriaInfo = {
           location: "Iglesia de Belén",
           category: "religioso",
           featured: true,
-          image: "/images/activity-musica.jpg",
-
         },
         {
           time: "2:00 PM",
@@ -190,8 +186,6 @@ export const feria: FeriaInfo = {
           location: "Carretera principal",
           category: "tradicional",
           featured: true,
-          image: "/images/activity-musica.jpg",
-
         },
         {
           time: "7:00 PM",
@@ -231,8 +225,6 @@ export const feria: FeriaInfo = {
           location: "Plaza Municipal",
           category: "cultural",
           featured: true,
-          image: "/images/activity-musica.jpg",
-
         },
         {
           time: "10:00 PM",
@@ -260,7 +252,6 @@ export const feria: FeriaInfo = {
           location: "Calles del pueblo",
           category: "desfile",
           featured: true,
-          image: "/images/activity-desfile.jpg",
         },
         {
           time: "3:00 PM",
@@ -282,8 +273,6 @@ export const feria: FeriaInfo = {
           location: "Plaza Municipal",
           category: "gastronomico",
           featured: true,
-          image: "/images/activity-musica.jpg",
-
         },
         {
           time: "9:00 AM",
@@ -335,7 +324,7 @@ export const restaurants: Place[] = [
     description: "Baleadas, platos del día y frescos naturales en el corazón del pueblo.",
     hours: "7:00 AM – 9:00 PM",
     address: "Calle Principal, frente al Parque",
-    image: "/images/laermita.jpg",
+    image: "/images/laermita.avif",
     mapsUrl: "https://maps.google.com",
   },
   {
@@ -344,7 +333,7 @@ export const restaurants: Place[] = [
     description: "Sopas, antojitos y desayunos hechos con amor. El sabor de casa.",
     hours: "6:00 AM – 8:00 PM",
     address: "Barrio El Centro, una cuadra del mercado",
-    image: "/images/lesly.jpg",
+    image: "/images/laermita.avif",
     mapsUrl: "https://maps.google.com",
   },
 ];
@@ -356,7 +345,7 @@ export const cafes: Place[] = [
     description: "Café cultivado en las montañas de Belén, pasteles artesanales y buen ambiente.",
     hours: "7:00 AM – 7:00 PM",
     address: "Parque Central",
-    image: "/images/elportal.jpg",
+    image: "/images/elportal.avif",
     mapsUrl: "https://maps.google.com",
   },
 ];
@@ -368,7 +357,7 @@ export const hotels: Place[] = [
     description: "Habitaciones limpias, wifi y desayuno incluido. A dos cuadras de todo.",
     hours: "Recepción 24h",
     address: "Una cuadra abajo del parque central",
-    image: "/images/posadabelen.jpg",
+    image: "/images/posadabelen.avif",
     mapsUrl: "https://maps.google.com",
   },
 ];
@@ -379,7 +368,7 @@ export const landmarks: Place[] = [
     tagline: "Patrimonio colonial · Siglo XVIII",
     description: "El corazón espiritual del pueblo. Arquitectura colonial única en la región.",
     address: "Parque Central",
-    image: "/images/laermita-lugar.jpg",
+    image: "/images/laermita-lugar.avif",
     mapsUrl: "https://maps.google.com",
   },
 ];

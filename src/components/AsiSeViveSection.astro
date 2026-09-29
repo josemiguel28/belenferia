@@ -5,18 +5,18 @@
 
 export interface GalleryItem {
   id: string;
-  src: string;          // 👈 RUTA DE LA FOTO REAL: ej: "/images/galeria/foto-01.jpg"
-  alt: string;          // Texto descriptivo para accesibilidad
-  aspectRatio: string;  // Proporción CSS (16 / 9, 4 / 5, 1 / 1)
-  contextHint: string;  // Descripción contextual
-  colSpan: 1 | 2;       // 2 = ancho completo (100%), 1 = 2 columnas (50%)
+  src: string; // 👈 RUTA DE LA FOTO REAL: ej: "/images/galeria/foto-01.jpg"
+  alt: string; // Texto descriptivo para accesibilidad
+  aspectRatio: string; // Proporción CSS (16 / 9, 4 / 5, 1 / 1)
+  contextHint: string; // Descripción contextual
+  colSpan: 1 | 2; // 2 = ancho completo (100%), 1 = 2 columnas (50%)
 }
 
 const items: GalleryItem[] = [
   // ── 1. Foto Protagonista (100% ancho · 16:9) ──────────────────────────────
   {
     id: "photo-01",
-    src: "/images/galeria/foto-01.jpg",
+    src: "/images/galeria/foto-01.avif",
     alt: "Vista panorámica del pueblo de Belén",
     aspectRatio: "16 / 9",
     contextHint: "Vista panorámica del pueblo",
@@ -26,7 +26,7 @@ const items: GalleryItem[] = [
   // ── 2 y 3. Dúo Vertical (2 columnas · 4:5) ─────────────────────────────────
   {
     id: "photo-02",
-    src: "/images/galeria/foto-02.jpg",
+    src: "/images/galeria/foto-02.avif",
     alt: "Calles empedradas y arquitectura colonial de Belén",
     aspectRatio: "4 / 5",
     contextHint: "Calles y arquitectura",
@@ -34,7 +34,7 @@ const items: GalleryItem[] = [
   },
   {
     id: "photo-03",
-    src: "/images/galeria/foto-03.jpg",
+    src: "/images/galeria/foto-03.avif",
     alt: "Detalles y tradiciones de la comunidad",
     aspectRatio: "4 / 5",
     contextHint: "Tradición y detalles",
@@ -44,7 +44,7 @@ const items: GalleryItem[] = [
   // ── 4. Foto Central (100% ancho · 16:9) ────────────────────────────────────
   {
     id: "photo-04",
-    src: "/images/galeria/foto-04.jpg",
+    src: "/images/galeria/foto-04.avif",
     alt: "Ambiente y momentos de la feria",
     aspectRatio: "16 / 9",
     contextHint: "Ambiente de la feria",
@@ -54,7 +54,7 @@ const items: GalleryItem[] = [
   // ── 5 y 6. Dúo Cuadrado (2 columnas · 1:1) ─────────────────────────────────
   {
     id: "photo-05",
-    src: "/images/galeria/foto-05.jpg",
+    src: "/images/galeria/foto-05.avif",
     alt: "Gente y familias de Belén",
     aspectRatio: "1 / 1",
     contextHint: "Gente de Belén",
@@ -62,7 +62,7 @@ const items: GalleryItem[] = [
   },
   {
     id: "photo-06",
-    src: "/images/galeria/foto-06.jpg",
+    src: "/images/galeria/foto-06.avif",
     alt: "Celebración y alegría durante los días de feria",
     aspectRatio: "1 / 1",
     contextHint: "Momentos de la feria",
@@ -72,7 +72,7 @@ const items: GalleryItem[] = [
   // ── 7. Cierre Panorámico (100% ancho · 16:9) ──────────────────────────────
   {
     id: "photo-07",
-    src: "/images/galeria/foto-07.jpg",
+    src: "/images/galeria/foto-07.avif",
     alt: "Atardecer en la plaza municipal de Belén",
     aspectRatio: "16 / 9",
     contextHint: "Atardecer en la plaza",

@@ -1,6 +1,6 @@
 ---
 // UpcomingSection.astro — Previsualización de lo que viene inmediatamente después
-// Muestra únicamente el día siguiente (Mañana) + botón secundario "Ver todas las actividades →"
+// Muestra únicamente el día siguiente (Mañana) + botón "Ver programa completo →"
 import type { FeriaDay } from "../data/feria";
 import ActivityRow from "./ActivityRow.astro";
 
@@ -16,7 +16,9 @@ const tomorrow = days[0];
 const tomorrowFull = (day: FeriaDay) => {
   const d = new Date(day.date + "T12:00:00");
   const wd = d.toLocaleDateString("es-HN", { weekday: "long" });
-  return wd.charAt(0).toUpperCase() + wd.slice(1);
+  const wdCap = wd.charAt(0).toUpperCase() + wd.slice(1);
+  const month = d.toLocaleDateString("es-HN", { month: "long" });
+  return `${wdCap} ${day.dayNumber} de ${month}`;
 };
 ---
 
@@ -33,12 +35,12 @@ const tomorrowFull = (day: FeriaDay) => {
       <div class="tomorrow-block">
         <h2 class="tomorrow-title">
           <span class="tomorrow-label">Mañana</span>
-          <span class="tomorrow-day">— {tomorrowFull(tomorrow)} {tomorrow.dayNumber}</span>
+          <span class="tomorrow-day">— {tomorrowFull(tomorrow)}</span>
         </h2>
-        <div role="list" aria-label={`Actividades del ${tomorrowFull(tomorrow)} ${tomorrow.dayNumber}`}>
+        <div class="tomorrow-list" role="list" aria-label={`Actividades de mañana`}>
           {tomorrow.activities.map((act) => (
             <div role="listitem">
-              <ActivityRow activity={act} compact={true} />
+              <ActivityRow activity={act} compact={true} dateLabel={tomorrowFull(tomorrow)} />
             </div>
           ))}
         </div>
@@ -52,17 +54,17 @@ const tomorrowFull = (day: FeriaDay) => {
       </div>
     )}
 
-    <!-- ── Botón Secundario: Ver todas las actividades ── -->
+    <!-- ── Botón: Ver programa completo → ── -->
     <div class="upcoming-cta-wrap">
       <button
         type="button"
         class="btn-see-all-schedule"
         data-open-schedule
-        aria-label="Abrir programa completo con todas las actividades"
+        aria-label="Ver el programa completo con todos los días de la feria"
       >
-        <span>Ver todas las actividades</span>
+        <span>Ver programa completo</span>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="cta-arrow" aria-hidden="true">
-          <path fill-rule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+          <path fill-rule="evenodd" d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8Z" clip-rule="evenodd" />
         </svg>
       </button>
     </div>
@@ -83,6 +85,11 @@ const tomorrowFull = (day: FeriaDay) => {
   }
 
   .upcoming-eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--color-muted);
     margin: 0;
   }
@@ -119,6 +126,20 @@ const tomorrowFull = (day: FeriaDay) => {
     letter-spacing: 0;
   }
 
+  .tomorrow-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #FFFFFF;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .tomorrow-list > div + div {
+    border-top: 1px solid #ECEEF1;
+  }
+
   .tomorrow-empty-msg {
     font-family: var(--font-body);
     font-size: 0.9375rem;
@@ -126,9 +147,9 @@ const tomorrowFull = (day: FeriaDay) => {
     margin: 0 0 1rem;
   }
 
-  /* ─── Botón Secundario "Ver todas las actividades" ── */
+  /* ─── Botón "Ver programa completo →" ── */
   .upcoming-cta-wrap {
-    padding-top: 0.75rem;
+    padding-top: 0.5rem;
   }
 
   .btn-see-all-schedule {
@@ -144,7 +165,7 @@ const tomorrowFull = (day: FeriaDay) => {
     border-radius: 8px;
     font-family: var(--font-body);
     font-size: 0.875rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--color-ink);
     cursor: pointer;
     text-decoration: none;
@@ -177,6 +198,7 @@ const tomorrowFull = (day: FeriaDay) => {
   @media (min-width: 480px) {
     .btn-see-all-schedule {
       width: auto;
+      min-width: 240px;
       padding-inline: 1.5rem;
     }
   }

@@ -9,6 +9,7 @@ import AsiSeViveSection from "../components/AsiSeViveSection.astro";
 import InfoSection from "../components/InfoSection.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import FullScheduleModal from "../components/FullScheduleModal.astro";
+import ActivityDetailModal from "../components/ActivityDetailModal.astro";
 import { feria } from "../data/feria";
 
 // ─── Determinar el día actual ─────────────────────────────────────────────────
@@ -89,6 +90,9 @@ const pageDesc  = `Programa del ${dayLabelCap} en la ${feria.name} ${feria.year}
     days={feria.days}
     initialDayIndex={todayIndex}
   />
+
+  <!-- ⑨ Modal / Bottom Sheet del Detalle de Actividad -->
+  <ActivityDetailModal />
 
 </BaseLayout>
 

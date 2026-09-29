@@ -1,57 +1,101 @@
 ---
-// ActivityRow.astro — Fila de actividad en estilo editorial (sin cards)
+// ActivityRow.astro — Fila de actividad interactiva
 import type { Activity } from "../data/feria";
 
 interface Props {
   activity: Activity;
   isNext?: boolean;    // marcar como "próxima" actividad
   compact?: boolean;   // variante compacta para upcoming
+  dateLabel?: string;  // fecha para el modal de detalle
 }
 
-const { activity, isNext = false, compact = false } = Astro.props;
+const { activity, isNext = false, compact = false, dateLabel = "" } = Astro.props;
 ---
 
 {compact ? (
-  <div class="activity-row activity-row--compact">
+  <button
+    type="button"
+    class="activity-row activity-row--compact"
+    data-open-activity
+    data-title={activity.title}
+    data-time={activity.time}
+    data-date={dateLabel}
+    data-location={activity.location}
+    data-category={activity.category}
+    data-description={activity.description ?? ""}
+    data-maps-url={activity.mapsUrl ?? ""}
+    aria-label={`Ver detalles de ${activity.title}, a las ${activity.time}`}
+  >
     <span class="activity-time activity-time--compact">{activity.time}</span>
     <span class="activity-name--compact">{activity.title}</span>
-  </div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="compact-chevron" aria-hidden="true">
+      <path fill-rule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+    </svg>
+  </button>
 ) : (
-  <div class={`activity-row ${isNext ? "activity-row--next" : ""}`}>
+  <button
+    type="button"
+    class:list={["activity-row", { "activity-row--next": isNext }]}
+    data-open-activity
+    data-title={activity.title}
+    data-time={activity.time}
+    data-date={dateLabel}
+    data-location={activity.location}
+    data-category={activity.category}
+    data-description={activity.description ?? ""}
+    data-maps-url={activity.mapsUrl ?? ""}
+    aria-label={`Ver detalles de ${activity.title}, a las ${activity.time} en ${activity.location}`}
+  >
     <span class="activity-time">{activity.time}</span>
     <div class="activity-body">
       <p class="activity-name">{activity.title}</p>
       <p class="activity-place">
-        <svg class="place-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-          <path fill-rule="evenodd" d="M8 1.5A4.5 4.5 0 0 0 3.5 6c0 2.29 1.7 4.716 4.5 7.5C10.8 10.716 12.5 8.29 12.5 6A4.5 4.5 0 0 0 8 1.5ZM8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z" clip-rule="evenodd" />
+        <svg class="place-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.541l.062.029.018-.008.006-.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clip-rule="evenodd" />
         </svg>
-        {activity.location}
+        <span>{activity.location}</span>
       </p>
     </div>
     {isNext && (
       <span class="next-badge" aria-label="Próxima actividad">Próxima</span>
     )}
-  </div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="row-chevron" aria-hidden="true">
+      <path fill-rule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+    </svg>
+  </button>
 )}
 
 <style>
   /* ─── Row base ───────────────────────────────────── */
   .activity-row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
-    padding: 1rem 0;
-    min-height: 44px;
+    padding: 0.875rem 0.5rem;
+    min-height: 52px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .activity-row + .activity-row {
-    border-top: 1px solid var(--color-border);
+  .activity-row:hover {
+    background-color: #F8F9FA;
+  }
+
+  .activity-row:active {
+    background-color: #F1F3F5;
   }
 
   /* ─── Highlighted: next activity ─────────────────── */
   .activity-row--next {
     padding-left: 0.875rem;
-    margin-left: -0.875rem;
     border-left: 3px solid var(--color-accent);
   }
 
@@ -65,8 +109,7 @@ const { activity, isNext = false, compact = false } = Astro.props;
     white-space: nowrap;
     flex-shrink: 0;
     width: 4.25rem;
-    padding-top: 0.125rem;
-    text-align: right;
+    text-align: left;
   }
 
   /* ─── Body column ────────────────────────────────── */
@@ -76,29 +119,43 @@ const { activity, isNext = false, compact = false } = Astro.props;
   }
 
   .activity-name {
-    font-size: 1rem;
+    font-size: 0.9375rem;
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.35;
     color: var(--color-ink);
     margin: 0;
+    word-break: break-word;
   }
 
   .activity-place {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.8125rem;
+    gap: 0.3rem;
+    font-size: 0.75rem;
     color: var(--color-muted);
-    margin: 0.2rem 0 0;
-    line-height: 1.4;
+    margin: 0.15rem 0 0;
+    line-height: 1.3;
   }
 
   .place-icon {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 0.8125rem;
+    height: 0.8125rem;
     flex-shrink: 0;
     color: var(--color-muted);
     opacity: 0.7;
+  }
+
+  .row-chevron {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+    color: #9CA3AF;
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+
+  .activity-row:hover .row-chevron {
+    transform: translateX(2px);
+    color: var(--color-accent);
   }
 
   /* ─── Next badge ─────────────────────────────────── */
@@ -112,20 +169,17 @@ const { activity, isNext = false, compact = false } = Astro.props;
     border: 1px solid var(--color-accent);
     border-radius: 3px;
     padding: 0.15em 0.4em;
-    align-self: flex-start;
-    margin-top: 0.2rem;
+    align-self: center;
   }
 
   /* ─── Compact variant (para Próximamente) ─────────── */
   .activity-row--compact {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 0.75rem;
-    padding: 0.625rem 0;
-  }
-
-  .activity-row--compact + .activity-row--compact {
-    border-top: 1px solid var(--color-border);
+    padding: 0.625rem 0.5rem;
+    min-height: 44px;
+    border-radius: 6px;
   }
 
   .activity-time--compact {
@@ -135,15 +189,29 @@ const { activity, isNext = false, compact = false } = Astro.props;
     color: var(--color-accent);
     white-space: nowrap;
     flex-shrink: 0;
-    width: 4rem;
-    text-align: right;
+    width: 4.25rem;
+    text-align: left;
   }
 
   .activity-name--compact {
-    font-size: 0.9375rem;
-    font-weight: 500;
+    font-size: 0.875rem;
+    font-weight: 600;
     color: var(--color-ink);
     flex: 1;
     min-width: 0;
+    word-break: break-word;
+  }
+
+  .compact-chevron {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
+    color: #9CA3AF;
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+
+  .activity-row--compact:hover .compact-chevron {
+    transform: translateX(2px);
+    color: var(--color-accent);
   }
 </style>
