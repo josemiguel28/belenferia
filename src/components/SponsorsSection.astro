@@ -1,0 +1,242 @@
+---
+// SponsorsSection.astro — "CON EL APOYO DE"
+// Sección de reconocimiento limpia, minimalista y ligera
+import { sponsors } from "../data/feria";
+
+const INITIAL_COUNT = 9;
+const hasMore = sponsors.length > INITIAL_COUNT;
+---
+
+<section id="patrocinadores" class="sponsors-section" aria-label="Patrocinadores y colaboradores">
+  <div class="container sponsors-inner">
+
+    <!-- Encabezado de la sección -->
+    <header class="sponsors-header">
+      <h2 class="sponsors-title">CON EL APOYO DE</h2>
+      <p class="sponsors-subtitle">
+        Gracias a las personas, negocios e instituciones que hicieron posible la Feria de Belén 2026.
+      </p>
+    </header>
+
+    <!-- Grid de logos -->
+    <div id="sponsors-grid" class="sponsors-grid" data-initial-count={INITIAL_COUNT}>
+      {sponsors.map((sponsor, index) => {
+        const isExtra = index >= INITIAL_COUNT;
+        return (
+          <div
+            class={`sponsor-item ${isExtra ? "sponsor-item--extra" : ""}`}
+            data-sponsor-index={index}
+          >
+            <img
+              src={sponsor.logo}
+              alt={sponsor.name}
+              title={sponsor.name}
+              class="sponsor-logo"
+              loading="lazy"
+              decoding="async"
+              width="180"
+              height="50"
+            />
+          </div>
+        );
+      })}
+    </div>
+
+    {hasMore && (
+      <div class="sponsors-actions">
+        <button
+          type="button"
+          id="toggle-sponsors-btn"
+          class="sponsors-toggle-btn"
+          aria-expanded="false"
+          aria-controls="sponsors-grid"
+        >
+          <span class="btn-label-more">Mostrar todos ↓</span>
+          <span class="btn-label-less" style="display: none;">Mostrar menos ↑</span>
+        </button>
+      </div>
+    )}
+
+  </div>
+</section>
+
+<script>
+  function initSponsorsToggle() {
+    const grid = document.getElementById("sponsors-grid");
+    const toggleBtn = document.getElementById("toggle-sponsors-btn");
+    if (!grid || !toggleBtn) return;
+
+    const labelMore = toggleBtn.querySelector(".btn-label-more") as HTMLElement | null;
+    const labelLess = toggleBtn.querySelector(".btn-label-less") as HTMLElement | null;
+    let isExpanded = false;
+
+    // Remove any previously attached listeners on Astro page transitions
+    const newBtn = toggleBtn.cloneNode(true) as HTMLElement;
+    toggleBtn.parentNode?.replaceChild(newBtn, toggleBtn);
+
+    const updatedLabelMore = newBtn.querySelector(".btn-label-more") as HTMLElement | null;
+    const updatedLabelLess = newBtn.querySelector(".btn-label-less") as HTMLElement | null;
+
+    newBtn.addEventListener("click", () => {
+      isExpanded = !isExpanded;
+      grid.classList.toggle("is-expanded", isExpanded);
+      newBtn.setAttribute("aria-expanded", String(isExpanded));
+
+      if (updatedLabelMore && updatedLabelLess) {
+        if (isExpanded) {
+          updatedLabelMore.style.display = "none";
+          updatedLabelLess.style.display = "inline";
+        } else {
+          updatedLabelMore.style.display = "inline";
+          updatedLabelLess.style.display = "none";
+        }
+      }
+    });
+  }
+
+  // Inicializar en carga y en transiciones de página de Astro
+  initSponsorsToggle();
+  document.addEventListener("astro:page-load", initSponsorsToggle);
+</script>
+
+<style>
+  /* ─── Contenedor y Espaciado ─────────────────────────── */
+  .sponsors-section {
+    background-color: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    padding-block: 3.5rem 3.5rem;
+  }
+
+  .sponsors-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* ─── Encabezado ─────────────────────────────────────── */
+  .sponsors-header {
+    max-width: 480px;
+    margin-bottom: 2rem;
+  }
+
+  .sponsors-title {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin: 0 0 0.625rem;
+  }
+
+  .sponsors-subtitle {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-ink);
+    margin: 0;
+  }
+
+  /* ─── Grid de Logos ─────────────────────────────────── */
+  .sponsors-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem 1rem;
+    align-items: center;
+    justify-items: center;
+  }
+
+  @media (min-width: 640px) {
+    .sponsors-grid {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2rem 1.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .sponsors-grid {
+      grid-template-columns: repeat(6, 1fr);
+      gap: 2rem 1.5rem;
+    }
+  }
+
+  /* ─── Item & Logo Bounding Box ──────────────────────── */
+  .sponsor-item {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .sponsor-logo {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* ─── Elementos Extra (Plegados / Expandidos) ────────── */
+  .sponsor-item--extra {
+    display: none;
+  }
+
+  .sponsors-grid.is-expanded .sponsor-item--extra {
+    display: flex;
+    animation: fadeInSponsor 0.25s var(--ease-out) forwards;
+  }
+
+  @keyframes fadeInSponsor {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sponsors-grid.is-expanded .sponsor-item--extra {
+      animation: none;
+    }
+  }
+
+  /* ─── Botón Mostrar Todos / Mostrar Menos ─────────────── */
+  .sponsors-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .sponsors-toggle-btn {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 9999px;
+    padding: 0.5rem 1.25rem;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .sponsors-toggle-btn:hover {
+    background-color: var(--color-bg-subtle);
+    border-color: var(--color-muted);
+  }
+
+  .sponsors-toggle-btn:active {
+    transform: translateY(1px);
+  }
+</style>

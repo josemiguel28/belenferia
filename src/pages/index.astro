@@ -3,10 +3,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import NavBar from "../components/NavBar.astro";
 import HeroSection from "../components/HeroSection.astro";
 import TodaySection from "../components/TodaySection.astro";
-import UpcomingSection from "../components/UpcomingSection.astro";
 import PuebloSection from "../components/PuebloSection.astro";
 import AsiSeViveSection from "../components/AsiSeViveSection.astro";
 import InfoSection from "../components/InfoSection.astro";
+import SponsorsSection from "../components/SponsorsSection.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import FullScheduleModal from "../components/FullScheduleModal.astro";
 import ActivityDetailModal from "../components/ActivityDetailModal.astro";
@@ -20,30 +20,29 @@ let todayIndex = feria.days.findIndex((d) => d.date === todayISO);
 // (Martes 06, índice 1) para mostrar un día con variedad de actividades.
 if (todayIndex === -1) todayIndex = 1;
 
-const todayDay     = feria.days[todayIndex];
-const upcomingDays = feria.days.slice(todayIndex + 1);
-const dayNumber    = todayIndex + 1;
+const todayDay = feria.days[todayIndex];
+const dayNumber = todayIndex + 1;
 
 // ─── Meta dinámica ────────────────────────────────────────────────────────────
-const fullDate    = new Date(todayDay.date + "T12:00:00");
-const dayLabel    = fullDate.toLocaleDateString("es-HN", {
-  weekday: "long", day: "numeric", month: "long"
+const fullDate = new Date(todayDay.date + "T12:00:00");
+const dayLabel = fullDate.toLocaleDateString("es-HN", {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
 });
 const dayLabelCap = dayLabel.charAt(0).toUpperCase() + dayLabel.slice(1);
 
 const pageTitle = `${feria.name} ${feria.year} — ${dayLabelCap}`;
-const pageDesc  = `Programa del ${dayLabelCap} en la ${feria.name} ${feria.year}. Actividades, restaurantes y guía de ${feria.town}, ${feria.department}.`;
+const pageDesc = `Programa del ${dayLabelCap} en la ${feria.name} ${feria.year}. Actividades, restaurantes y guía de ${feria.town}, ${feria.department}.`;
 ---
 
 <BaseLayout title={pageTitle} description={pageDesc}>
-
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
   <!-- ① Navbar -->
   <NavBar shortName={feria.shortName} />
 
   <main id="main-content">
-
     <!-- ② Hero -->
     <HeroSection
       feriaName={feria.name}
@@ -63,37 +62,32 @@ const pageDesc  = `Programa del ${dayLabelCap} en la ${feria.name} ${feria.year}
       totalDays={feria.totalDays}
     />
 
-    <!-- ④ ¿Qué viene después? -->
-    <UpcomingSection days={upcomingDays} />
-
-    <!-- ⑤ Descubre el pueblo -->
+    <!-- ④ Descubre el pueblo -->
     <PuebloSection />
 
-    <!-- ⑥ Así se vive Belén -->
+    <!-- ⑤ Así se vive Belén -->
     <AsiSeViveSection />
 
-    <!-- ⑦ Información práctica -->
-    <InfoSection />
+    <!-- ⑦ Patrocinadores y colaboradores -->
+    <SponsorsSection />
 
+    <!-- ⑥ Información práctica -->
+    <InfoSection />
   </main>
 
   <!-- ⑦ Footer -->
   <SiteFooter
     feriaName={feria.name}
     town={feria.town}
+    department={feria.department}
     year={feria.year}
-    patronSaint={feria.patronSaint}
   />
 
   <!-- ⑧ Modal / Bottom Sheet del Programa Completo -->
-  <FullScheduleModal
-    days={feria.days}
-    initialDayIndex={todayIndex}
-  />
+  <FullScheduleModal days={feria.days} initialDayIndex={todayIndex} />
 
   <!-- ⑨ Modal / Bottom Sheet del Detalle de Actividad -->
   <ActivityDetailModal />
-
 </BaseLayout>
 
 <style>
@@ -110,5 +104,7 @@ const pageDesc  = `Programa del ${dayLabelCap} en la ${feria.name} ${feria.year}
     text-decoration: none;
     border-radius: 0 0 6px 6px;
   }
-  .skip-link:focus { top: 0; }
+  .skip-link:focus {
+    top: 0;
+  }
 </style>

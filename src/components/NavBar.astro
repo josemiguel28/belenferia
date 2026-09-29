@@ -22,7 +22,7 @@ const { shortName } = Astro.props;
     <!-- Desktop nav links -->
     <nav class="navbar-nav" aria-label="Navegación principal">
       <a href="#hoy" class="nav-link">Hoy</a>
-      <a href="#proximo" class="nav-link">Programa</a>
+      <button type="button" class="nav-link nav-btn" data-open-schedule>Programa</button>
       <a href="#pueblo" class="nav-link">El Pueblo</a>
       <a href="#info" class="nav-link">Info</a>
     </nav>
@@ -51,7 +51,7 @@ const { shortName } = Astro.props;
   >
     <div class="container">
       <a href="#hoy" class="mobile-link" id="mnav-hoy">Hoy</a>
-      <a href="#proximo" class="mobile-link" id="mnav-programa">Programa</a>
+      <button type="button" class="mobile-link mobile-btn" data-open-schedule id="mnav-programa">Programa</button>
       <a href="#pueblo" class="mobile-link" id="mnav-pueblo">El Pueblo</a>
       <a href="#info" class="mobile-link" id="mnav-info">Información</a>
     </div>
@@ -67,6 +67,9 @@ const { shortName } = Astro.props;
     const backdrop = document.getElementById("nav-backdrop");
     const navbar = document.querySelector(".navbar");
     if (!toggle || !menu || !backdrop || !navbar) return;
+
+    if (toggle.dataset.navBound === "true") return;
+    toggle.dataset.navBound = "true";
 
     const links = menu.querySelectorAll(".mobile-link");
 
@@ -90,13 +93,23 @@ const { shortName } = Astro.props;
       document.body.style.overflow = "";
     };
 
-    toggle.addEventListener("click", () =>
-      menu.classList.contains("is-open") ? close() : open(),
-    );
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      menu.classList.contains("is-open") ? close() : open();
+    });
+
     backdrop.addEventListener("click", close);
-    links.forEach((l) => l.addEventListener("click", close));
+
+    links.forEach((l) => {
+      l.addEventListener("click", () => {
+        close();
+      });
+    });
+
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape" && menu.classList.contains("is-open")) {
+        close();
+      }
     });
 
     const onScroll = () => {
@@ -188,6 +201,9 @@ const { shortName } = Astro.props;
     text-decoration: none;
     padding: 0.5rem 0.75rem;
     border-radius: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
     transition: color 0.15s ease;
     min-height: 44px;
     display: flex;
@@ -249,9 +265,11 @@ const { shortName } = Astro.props;
     overflow: hidden;
     max-height: 0;
     opacity: 0;
+    visibility: hidden;
     transition:
-      max-height 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.18s ease;
+      max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.22s ease,
+      visibility 0.28s;
   }
 
   @media (min-width: 640px) {
@@ -261,7 +279,9 @@ const { shortName } = Astro.props;
   }
 
   .mobile-menu.is-open {
-    max-height: 300px;
+    max-height: 320px;
+    opacity: 1;
+    visibility: visible;
   }
 
   .mobile-menu .container {
@@ -284,8 +304,13 @@ const { shortName } = Astro.props;
     font-weight: 600;
     color: var(--color-ink);
     text-decoration: none;
-    padding: 0.625rem 0;
+    background: transparent;
+    border: none;
     border-bottom: 1px solid var(--color-border);
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    padding: 0.625rem 0;
     min-height: 52px;
     transition: color 0.15s ease;
   }

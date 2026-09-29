@@ -238,7 +238,7 @@ const dateRangeSubtitle = `${startDayNum}–${endDayNum} de ${monthName}`;
 
     let previousActiveElement: HTMLElement | null = null;
 
-    const openModal = () => {
+    const openModal = (targetDayIndex?: number) => {
       previousActiveElement = document.activeElement as HTMLElement | null;
       backdrop.classList.add("is-open");
       modal.classList.add("is-visible");
@@ -246,11 +246,29 @@ const dateRangeSubtitle = `${startDayNum}–${endDayNum} de ${monthName}`;
       document.body.style.overflow = "hidden";
       modal.focus();
 
-      // Scroll del acordeón al día de hoy si está abierto
+      // Si se solicita abrir un día específico (ej. mañana), abrir ese acordeón
+      if (
+        typeof targetDayIndex === "number" &&
+        !isNaN(targetDayIndex) &&
+        targetDayIndex >= 0 &&
+        targetDayIndex < dayItems.length
+      ) {
+        dayItems.forEach((el, idx) => {
+          el.open = idx === targetDayIndex;
+        });
+      } else {
+        dayItems.forEach((el, idx) => {
+          el.open = idx === activeTodayIdx;
+        });
+      }
+
+      // Scroll del acordeón al día abierto
       setTimeout(() => {
-        const todayEl = modal.querySelector(".schedule-day.is-today");
-        if (todayEl) {
-          todayEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        const targetEl =
+          modal.querySelector(".schedule-day[open]") ||
+          modal.querySelector(".schedule-day.is-today");
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
       }, 150);
     };
@@ -287,7 +305,12 @@ const dateRangeSubtitle = `${startDayNum}–${endDayNum} de ${monthName}`;
       const trigger = (e.target as HTMLElement).closest("[data-open-schedule]");
       if (trigger) {
         e.preventDefault();
-        openModal();
+        const dayAttr = (trigger as HTMLElement).dataset.scheduleDay;
+        const targetIdx =
+          dayAttr !== undefined && dayAttr !== ""
+            ? parseInt(dayAttr, 10)
+            : undefined;
+        openModal(targetIdx);
       }
     });
   }

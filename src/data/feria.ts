@@ -372,3 +372,153 @@ export const landmarks: Place[] = [
     mapsUrl: "https://maps.google.com",
   },
 ];
+
+// ─── Patrocinadores y colaboradores ──────────────────────────────────────────
+
+export interface Sponsor {
+  name: string;
+  logo: string;
+}
+
+export const sponsors: Sponsor[] = [
+  {
+    name: "Inversiones Garcia Lara",
+    logo: "/images/sponsors/i-garcia-lara.avif",
+  },
+  {
+    name: "El Portal",
+    logo: "/images/sponsors/el-portal.avif",
+  },
+  {
+    name: "Municipalidad",
+    logo: "/images/sponsors/municipalidad.avif",
+  },
+  {
+    name: "Darely Salón",
+    logo: "/images/sponsors/darely-salon.avif",
+  },
+  {
+    name: "Wilson Pineda Diputado",
+    logo: "/images/sponsors/wilson-pineda.avif",
+  },
+  {
+    name: "Un Gobierno que hace la diferencia",
+    logo: "/images/sponsors/gobierno.avif",
+  },
+  {
+    name: "Inversiones Lara",
+    logo: "/images/sponsors/i-lara.avif",
+  },
+  {
+    name: "Inversiones Portillo Leiva",
+    logo: "/images/sponsors/i-portillo-leiva.avif",
+  },
+  {
+    name: "Creativos Papelería y Más",
+    logo: "/images/sponsors/creativos.avif",
+  },
+  {
+    name: "Clínica Dental Dra. Seyla",
+    logo: "/images/sponsors/clinica-dental.avif",
+  },
+  {
+    name: "Gasolinera Belen",
+    logo: "/images/sponsors/gasolinera.avif",
+  },
+  {
+    name: "LawnCare",
+    logo: "/images/sponsors/lawncare.avif",
+  },
+  {
+    name: "Congreso Nacional",
+    logo: "/images/sponsors/congreso-nacional.avif",
+  },
+  {
+    name: "La ermita",
+    logo: "/images/sponsors/la-ermita.avif",
+  },
+  {
+    name: "Crea Decoraciones",
+    logo: "/images/sponsors/crea-decoraciones.avif",
+  },
+  {
+    name: "Motorepuestos Valentina",
+    logo: "/images/sponsors/repuesto-valentina.avif",
+  },
+  {
+    name: "Inversiones el profe",
+    logo: "/images/sponsors/i-elprofe.avif",
+  },
+  {
+    name: "Comedor Jadismary",
+    logo: "/images/sponsors/comedor-jadismary.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/vaneyani.avif",
+  },
+  {
+    name: "Papelería Fernanda",
+    logo: "/images/sponsors/papeleria-fernanda.avif",
+  },
+  {
+    name: "Minsi Shop",
+    logo: "/images/sponsors/minsi-shop.avif",
+  },
+  {
+    name: "Finca Membreño",
+    logo: "/images/sponsors/finca-membreno.avif",
+  },
+  {
+    name: "Inversiones Ponce",
+    logo: "/images/sponsors/i-ponce.avif",
+  },
+  {
+    name: "Agente de Viajes Alejandra",
+    logo: "/images/sponsors/agente-alejandra.avif",
+  },
+  {
+    name: "Mundo Floral",
+    logo: "/images/sponsors/mundo-floral.avif",
+  },
+  {
+    name: "Gobernación de Lempira",
+    logo: "/images/sponsors/gobernacion-lempira.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/elparaisotropical.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/blackhorse.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/i-je.avif",
+  }, {
+    name: "",
+    logo: "/images/sponsors/aris-belen.avif",
+  }, {
+    name: "",
+    logo: "/images/sponsors/i-wilman.avif",
+  }, {
+    name: "",
+    logo: "/images/sponsors/i-amaya.avif",
+  }, {
+    name: "",
+    logo: "/images/sponsors/i-jcd.avif",
+  }, {
+    name: "",
+    logo: "/images/sponsors/jefry-hernandez.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/pedro-portillo.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/webtoop.avif",
+  },
+];
+
