@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
+import SpeedInsights from "@vercel/speed-insights/astro";
 import "../styles/global.css";
 
 interface Props {
@@ -40,5 +41,6 @@ const {
   </head>
   <body>
     <slot />
+    <SpeedInsights />
   </body>
 </html>
