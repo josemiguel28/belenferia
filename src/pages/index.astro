@@ -16,8 +16,8 @@ import { getFairState } from "../utils/fairState";
 // ─── Estado temporal de la feria (Zona Horaria Oficial: America/Tegucigalpa) ───
 const fairState = getFairState();
 
-// ─── Meta dinámica ────────────────────────────────────────────────────────────
-const pageTitle = `${feria.name} ${feria.year} — ${fairState.dateFormatted}`;
+// ─── Meta tags ────────────────────────────────────────────────────────────────
+const pageTitle = `${feria.name} ${feria.year}`;
 const pageDesc = `Guía y programa oficial de la ${feria.name} ${feria.year} en ${feria.town}, ${feria.department}. Fechas: ${fairState.dateRangeLabel}.`;
 ---
 
