@@ -1,5 +1,8 @@
 ---
 // NavBar.astro — Fondo claro, editorial, sin colores de UI
+import { Image } from "astro:assets";
+import logoImage from "../assets/logo.avif";
+
 interface Props {
   shortName: string;
 }
@@ -10,12 +13,13 @@ const { shortName } = Astro.props;
   <div class="navbar-inner container">
     <!-- Logo -->
     <a href="/" class="navbar-logo" aria-label={`${shortName} — Inicio`}>
-      <img
-        src="/logo.avif"
+      <Image
+        src={logoImage}
         alt="Logo"
         class="logo-img"
-        width="60"
-        height="60"
+        width={120}
+        height={64}
+        loading="eager"
       />
     </a>
 

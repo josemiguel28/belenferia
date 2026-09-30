@@ -305,13 +305,19 @@ export const feria: FeriaInfo = {
 
 // ─── Tipos de lugar ──────────────────────────────────────────────────────────
 
+import type { ImageMetadata } from "astro";
+import imgLaErmita from "../assets/images/laermita.avif";
+import imgLaBendicion from "../assets/images/labendicion.avif";
+import imgElPortal from "../assets/images/elportal.avif";
+import imgPosadaBelen from "../assets/images/posadabelen.avif";
+
 export interface Place {
   name: string;
   tagline: string;
   description: string;
   hours?: string;
   address: string;
-  image: string;
+  image: ImageMetadata;
   mapsUrl?: string;
 }
 
@@ -324,7 +330,7 @@ export const restaurants: Place[] = [
     description: "Pupusas, platos del día y frescos naturales en el corazón del pueblo.",
     hours: "7:00 AM – 9:00 PM",
     address: "Frente a iglesia Católica La Ermita",
-    image: "/images/laermita.avif",
+    image: imgLaErmita,
     mapsUrl: "https://maps.app.goo.gl/qioXPZz2QwYxTcFBA",
   },
   {
@@ -333,7 +339,7 @@ export const restaurants: Place[] = [
     description: "Baleadas, pollo chuco, y tacos flauta.",
     hours: "9:00 AM – 9:00 PM",
     address: "Una cuadra abajo del parque central",
-    image: "/images/labendicion.avif",
+    image: imgLaBendicion,
     mapsUrl: "https://maps.app.goo.gl/ShantXBXvXLLJ1Ej6",
   },
 ];
@@ -345,7 +351,7 @@ export const cafes: Place[] = [
     description: "Café cultivado en las montañas de Belén, postres y buen ambiente.",
     hours: "9:00 AM – 7:00 PM",
     address: "Parque Central",
-    image: "/images/elportal.avif",
+    image: imgElPortal,
     mapsUrl: "https://maps.app.goo.gl/2ACCvBXXymLRbhRz5",
   },
 ];
@@ -357,19 +363,8 @@ export const hotels: Place[] = [
     description: "Habitaciones limpias, wifi y restaurante. A dos cuadras de todo.",
     hours: "Recepción 24h",
     address: "Una cuadra abajo del parque central",
-    image: "/images/posadabelen.avif",
+    image: imgPosadaBelen,
     mapsUrl: "https://maps.app.goo.gl/vngr63xHDu6YyG4YA",
-  },
-];
-
-export const landmarks: Place[] = [
-  {
-    name: "Iglesia de Belén",
-    tagline: "Patrimonio colonial · Siglo XVIII",
-    description: "El corazón espiritual del pueblo. Arquitectura colonial única en la región.",
-    address: "Parque Central",
-    image: "/images/laermita-lugar.avif",
-    mapsUrl: "https://maps.google.com",
   },
 ];
 

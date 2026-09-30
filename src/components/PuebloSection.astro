@@ -1,6 +1,7 @@
 ---
 // PuebloSection.astro — Descubre el pueblo
 // Tabs editoriales (underline naranja) · Cards sobrias · Sin colores de UI
+import { Image } from "astro:assets";
 import {
   restaurants,
   cafes,
@@ -74,13 +75,16 @@ const ICON: Record<string, string> = {
                 <li class="carousel-item" role="listitem">
                   <article class="place-card">
                     <div class="place-photo-wrap">
-                      <img
+                      <Image
                         src={place.image}
                         alt={place.name}
                         class="place-photo"
                         loading="lazy"
-                        width="600"
-                        height="400"
+                        decoding="async"
+                        widths={[320, 600]}
+                        sizes="(min-width: 1024px) 280px, 75vw"
+                        format="avif"
+                        quality={75}
                       />
                     </div>
                     <div class="place-body">

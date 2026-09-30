@@ -1,6 +1,8 @@
 ---
 // HeroSection.astro — Hero moderno con jerarquía clara y estado temporal unificado
+import { Image } from "astro:assets";
 import type { FairState } from "../utils/fairState";
+import heroImage from "../assets/hero.avif";
 
 interface Props {
   feriaName: string;
@@ -33,14 +35,16 @@ if (fairState.status === "DURING") {
 <section class="hero" aria-label={`Bienvenida a la ${feriaName}`}>
   <!-- Imagen de fondo -->
   <div class="hero-bg" aria-hidden="true">
-    <img
-      src="/hero.avif"
+    <Image
+      src={heroImage}
       alt=""
       class="hero-img"
       loading="eager"
       fetchpriority="high"
-      width="1400"
-      height="788"
+      widths={[480, 800, 1200, 1600]}
+      sizes="100vw"
+      format="avif"
+      quality={75}
     />
     <div class="hero-overlay"></div>
   </div>

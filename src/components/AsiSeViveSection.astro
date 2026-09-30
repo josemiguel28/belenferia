@@ -1,82 +1,107 @@
 ---
 // AsiSeViveSection.astro — "ASÍ SE VIVE BELÉN"
 // Exploración de composición y distribución de fotografías Mobile-First (~390px)
-// Admite tanto fotografías reales (asignando `src`) como placeholders limpios sin etiquetas.
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+import foto01 from "../assets/images/galeria/foto-01.avif";
+import foto02 from "../assets/images/galeria/foto-02.avif";
+import foto03 from "../assets/images/galeria/foto-03.avif";
+import foto04 from "../assets/images/galeria/foto-04.avif";
+import foto05 from "../assets/images/galeria/foto-05.avif";
+import foto06 from "../assets/images/galeria/foto-06.avif";
+import foto07 from "../assets/images/galeria/foto-07.avif";
 
 export interface GalleryItem {
   id: string;
-  src: string; // 👈 RUTA DE LA FOTO REAL: ej: "/images/galeria/foto-01.jpg"
-  alt: string; // Texto descriptivo para accesibilidad
-  aspectRatio: string; // Proporción CSS (16 / 9, 4 / 5, 1 / 1)
-  contextHint: string; // Descripción contextual
-  colSpan: 1 | 2; // 2 = ancho completo (100%), 1 = 2 columnas (50%)
+  image: ImageMetadata;
+  alt: string;
+  aspectRatio: string;
+  contextHint: string;
+  colSpan: 1 | 2;
+  sizes: string;
+  widths: number[];
 }
 
 const items: GalleryItem[] = [
   // ── 1. Foto Protagonista (100% ancho · 16:9) ──────────────────────────────
   {
     id: "photo-01",
-    src: "/images/galeria/foto-01.avif",
+    image: foto01,
     alt: "Vista panorámica del pueblo de Belén",
     aspectRatio: "16 / 9",
     contextHint: "Vista panorámica del pueblo",
     colSpan: 2,
+    sizes: "(min-width: 1024px) 800px, 100vw",
+    widths: [480, 800, 1200],
   },
 
   // ── 2 y 3. Dúo Vertical (2 columnas · 4:5) ─────────────────────────────────
   {
     id: "photo-02",
-    src: "/images/galeria/foto-02.avif",
+    image: foto02,
     alt: "Calles empedradas y arquitectura colonial de Belén",
     aspectRatio: "4 / 5",
     contextHint: "Calles y arquitectura",
     colSpan: 1,
+    sizes: "(min-width: 1024px) 400px, 50vw",
+    widths: [320, 640],
   },
   {
     id: "photo-03",
-    src: "/images/galeria/foto-03.avif",
+    image: foto03,
     alt: "Detalles y tradiciones de la comunidad",
     aspectRatio: "4 / 5",
     contextHint: "Tradición y detalles",
     colSpan: 1,
+    sizes: "(min-width: 1024px) 400px, 50vw",
+    widths: [320, 640],
   },
 
   // ── 4. Foto Central (100% ancho · 16:9) ────────────────────────────────────
   {
     id: "photo-04",
-    src: "/images/galeria/foto-04.avif",
+    image: foto04,
     alt: "Ambiente y momentos de la feria",
     aspectRatio: "16 / 9",
     contextHint: "Ambiente de la feria",
     colSpan: 2,
+    sizes: "(min-width: 1024px) 800px, 100vw",
+    widths: [480, 800, 1200],
   },
 
   // ── 5 y 6. Dúo Cuadrado (2 columnas · 1:1) ─────────────────────────────────
   {
     id: "photo-05",
-    src: "/images/galeria/foto-05.avif",
+    image: foto05,
     alt: "Gente y familias de Belén",
     aspectRatio: "1 / 1",
     contextHint: "Gente de Belén",
     colSpan: 1,
+    sizes: "(min-width: 1024px) 400px, 50vw",
+    widths: [320, 640],
   },
   {
     id: "photo-06",
-    src: "/images/galeria/foto-06.avif",
+    image: foto06,
     alt: "Celebración y alegría durante los días de feria",
     aspectRatio: "1 / 1",
     contextHint: "Momentos de la feria",
     colSpan: 1,
+    sizes: "(min-width: 1024px) 400px, 50vw",
+    widths: [320, 640],
   },
 
   // ── 7. Cierre Panorámico (100% ancho · 16:9) ──────────────────────────────
   {
     id: "photo-07",
-    src: "/images/galeria/foto-07.avif",
+    image: foto07,
     alt: "Atardecer en la plaza municipal de Belén",
     aspectRatio: "16 / 9",
     contextHint: "Atardecer en la plaza",
     colSpan: 2,
+    sizes: "(min-width: 1024px) 800px, 100vw",
+    widths: [480, 800, 1200],
   },
 ];
 ---
@@ -108,40 +133,19 @@ const items: GalleryItem[] = [
             style={`--aspect-ratio: ${item.aspectRatio};`}
             data-id={item.id}
           >
-            {item.src ? (
-              /* ── FOTOGRAFÍA REAL ── */
-              <figure class="photo-card">
-                <img
-                  src={item.src}
-                  alt={item.alt || item.contextHint}
-                  class="photo-img"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </figure>
-            ) : (
-              /* ── PLACEHOLDER NEUTRO (sin labels ni etiquetas) ── */
-              <div class="placeholder-box" aria-label={item.contextHint}>
-                <div class="placeholder-bg" aria-hidden="true" />
-                <div class="placeholder-center">
-                  <div class="photo-indicator" aria-hidden="true">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="camera-icon"
-                    >
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                      <circle cx="12" cy="13" r="4" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            )}
+            <figure class="photo-card">
+              <Image
+                src={item.image}
+                alt={item.alt || item.contextHint}
+                class="photo-img"
+                widths={item.widths}
+                sizes={item.sizes}
+                format="avif"
+                quality={75}
+                loading="lazy"
+                decoding="async"
+              />
+            </figure>
           </div>
         ))
       }
