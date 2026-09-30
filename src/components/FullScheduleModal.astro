@@ -635,7 +635,7 @@ const dateRangeSubtitle = `${startDayNum}–${endDayNum} de ${monthName}`;
     color: var(--color-accent);
   }
 
-  /* ─── Desktop (>= 640px): Modal Centrado ───────────── */
+  /* ─── Tablet & Desktop: Modal Centrado ───────────── */
   @media (min-width: 640px) {
     .schedule-backdrop {
       align-items: center;
@@ -680,6 +680,28 @@ const dateRangeSubtitle = `${startDayNum}–${endDayNum} de ${monthName}`;
 
     .schedule-day-content {
       padding: 0.65rem 1.25rem 0.85rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .schedule-sheet {
+      max-width: 640px;
+    }
+    .schedule-act-btn {
+      padding: 0.75rem 0.65rem;
+    }
+    .act-title {
+      font-size: 0.9375rem;
+    }
+    .act-time {
+      font-size: 0.8125rem;
+      width: 4.75rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .schedule-sheet {
+      max-width: 680px;
     }
   }
 

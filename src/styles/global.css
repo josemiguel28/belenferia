@@ -89,11 +89,44 @@ img { display: block; max-width: 100%; }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   LAYOUT
+   LAYOUT & RESPONSIVE CONTAINERS
    ═══════════════════════════════════════════════════════════ */
+:root {
+  --page-max: 560px;
+  --page-px: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-max: 768px;
+    --page-px: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-max: 1080px;
+    --page-px: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --page-max: 1240px;
+    --page-px: 2.5rem;
+  }
+}
+
 .container {
   width: 100%;
   max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-px);
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: min(100%, 780px);
   margin-inline: auto;
   padding-inline: var(--page-px);
 }

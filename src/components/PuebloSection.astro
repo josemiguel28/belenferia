@@ -488,31 +488,92 @@ const ICON: Record<string, string> = {
     transform: translateX(2px);
   }
 
-  /* ─── Responsive ──────────────────────────────────── */
-  @media (min-width: 580px) {
+  /* ─── Tablet & Desktop Responsive ───────────────── */
+  @media (min-width: 580px) and (max-width: 767px) {
     .carousel-item {
       flex: 0 0 clamp(252px, 43vw, 308px);
     }
   }
 
-  @media (min-width: 1024px) {
-    .carousel-outer {
-      overflow: visible;
+  @media (min-width: 768px) {
+    .pueblo-section {
+      padding-block: 4rem;
     }
-    .carousel-track {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      overflow-x: visible;
-      scroll-snap-type: none;
-      margin-inline: 0;
-      padding-right: 0;
+
+    .pueblo-header {
+      margin-bottom: 2.25rem;
     }
-    .carousel-item {
-      flex: none;
+
+    .pueblo-title {
+      font-size: 2.25rem;
     }
+
     .pueblo-tabs {
       flex-wrap: wrap;
       overflow-x: visible;
+      gap: 0.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .pueblo-tab {
+      padding: 0.75rem 1rem;
+      font-size: 0.9375rem;
+    }
+
+    .carousel-outer {
+      overflow: visible;
+    }
+
+    .carousel-track {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-inline: 0;
+      padding-inline: 0;
+      padding-right: 0;
+      overflow-x: visible;
+      scroll-snap-type: none;
+    }
+
+    .carousel-item {
+      flex: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .pueblo-section {
+      padding-block: 5rem;
+    }
+
+    .pueblo-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .pueblo-title {
+      font-size: 2.75rem;
+    }
+
+    .pueblo-tabs {
+      gap: 0.5rem;
+      margin-bottom: 2.25rem;
+    }
+
+    .pueblo-tab {
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+    }
+
+    .carousel-track {
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .place-body {
+      padding: 1.125rem 1.25rem 1.35rem;
+    }
+
+    .place-name {
+      font-size: 1.125rem;
     }
   }
 

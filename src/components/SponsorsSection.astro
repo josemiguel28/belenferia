@@ -148,17 +148,65 @@ const hasMore = sponsors.length > INITIAL_COUNT;
     justify-items: center;
   }
 
-  @media (min-width: 640px) {
+  @media (min-width: 580px) and (max-width: 767px) {
     .sponsors-grid {
-      grid-template-columns: repeat(5, 1fr);
-      gap: 2rem 1.5rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.75rem 1.25rem;
     }
   }
 
   @media (min-width: 768px) {
+    .sponsors-section {
+      padding-block: 4.5rem;
+    }
+
+    .sponsors-header {
+      max-width: 540px;
+      margin-bottom: 2.5rem;
+    }
+
+    .sponsors-subtitle {
+      font-size: 1rem;
+    }
+
     .sponsors-grid {
-      grid-template-columns: repeat(6, 1fr);
-      gap: 2rem 1.5rem;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2.25rem 1.5rem;
+    }
+
+    .sponsor-item {
+      height: 52px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .sponsors-section {
+      padding-block: 5.5rem;
+    }
+
+    .sponsors-header {
+      max-width: 580px;
+      margin-bottom: 3rem;
+    }
+
+    .sponsors-subtitle {
+      font-size: 1.0625rem;
+    }
+
+    .sponsors-grid {
+      grid-template-columns: repeat(7, 1fr);
+      gap: 2.5rem 1.75rem;
+    }
+
+    .sponsor-item {
+      height: 56px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .sponsors-grid {
+      grid-template-columns: repeat(9, 1fr);
+      gap: 2.75rem 2rem;
     }
   }
 

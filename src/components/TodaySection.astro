@@ -486,27 +486,99 @@ const daysUntilText = daysUntil === 1 ? "Falta 1 día" : `Faltan ${daysUntil} d�
     transform: translateX(3px);
   }
 
-  /* ─── Desktop (>= 640px) ─────────────────────────── */
+  /* ─── Tablet & Desktop Responsive Scaling ──────────── */
   @media (min-width: 640px) {
-    .today-section {
-      padding-block: 3.5rem 3rem;
-    }
-
-    .act-time-col {
-      width: 5.5rem;
-    }
-
-    .act-title {
-      font-size: 1rem;
-    }
-
     .btn-full-schedule {
       width: auto;
       min-width: 240px;
     }
+  }
+
+  @media (min-width: 768px) {
+    .today-section {
+      padding-block: 4rem 3.5rem;
+    }
+
+    .today-section .container {
+      max-width: 780px;
+    }
+
+    .today-header {
+      margin-bottom: 2rem;
+    }
+
+    .today-title {
+      font-size: 2.25rem;
+    }
+
+    .today-list {
+      gap: 0.625rem;
+    }
+
+    .today-act-card {
+      padding: 1.125rem 1.25rem;
+      border-radius: 10px;
+    }
+
+    .act-time-col {
+      width: 5.75rem;
+    }
+
+    .act-time {
+      font-size: 0.875rem;
+    }
+
+    .act-title {
+      font-size: 1.0625rem;
+    }
 
     .state-card {
-      padding: 2.5rem 2rem;
+      padding: 3rem 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .today-section {
+      padding-block: 5rem 4.5rem;
+    }
+
+    .today-section .container {
+      max-width: 820px;
+    }
+
+    .today-header {
+      margin-bottom: 2.25rem;
+    }
+
+    .today-title {
+      font-size: 2.5rem;
+    }
+
+    .today-act-card {
+      padding: 1.25rem 1.5rem;
+      border-radius: 12px;
+    }
+
+    .act-time-col {
+      width: 6.25rem;
+    }
+
+    .act-time {
+      font-size: 0.9375rem;
+    }
+
+    .act-title {
+      font-size: 1.125rem;
+    }
+
+    .today-cta-wrap {
+      margin-top: 1.75rem;
+    }
+
+    .btn-full-schedule {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      min-width: 260px;
     }
   }
 

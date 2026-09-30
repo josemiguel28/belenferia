@@ -188,12 +188,37 @@ const { shortName } = Astro.props;
     gap: 0;
   }
 
-  @media (min-width: 640px) {
+  @media (min-width: 768px) {
+    .navbar-inner {
+      height: 64px;
+    }
     .navbar-nav {
       display: flex;
+      gap: 0.25rem;
     }
     .hamburger {
       display: none;
+    }
+    .logo-img {
+      height: 44px;
+    }
+    .nav-link {
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.5rem 0.875rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .navbar-inner {
+      height: 68px;
+    }
+    .logo-img {
+      height: 48px;
+    }
+    .nav-link {
+      font-size: 0.9375rem;
+      padding: 0.5rem 1.125rem;
     }
   }
 
@@ -204,11 +229,11 @@ const { shortName } = Astro.props;
     color: var(--color-muted);
     text-decoration: none;
     padding: 0.5rem 0.75rem;
-    border-radius: 4px;
+    border-radius: 6px;
     background: transparent;
     border: none;
     cursor: pointer;
-    transition: color 0.15s ease;
+    transition: color 0.15s ease, background-color 0.15s ease;
     min-height: 44px;
     display: flex;
     align-items: center;
@@ -216,6 +241,7 @@ const { shortName } = Astro.props;
 
   .nav-link:hover {
     color: var(--color-ink);
+    background-color: var(--color-bg-subtle);
   }
 
   /* ─── Hamburger ───────────────────────────────── */
@@ -276,7 +302,7 @@ const { shortName } = Astro.props;
       visibility 0.28s;
   }
 
-  @media (min-width: 640px) {
+  @media (min-width: 768px) {
     .mobile-menu {
       display: none;
     }
@@ -342,7 +368,7 @@ const { shortName } = Astro.props;
     opacity: 1;
   }
 
-  @media (min-width: 640px) {
+  @media (min-width: 768px) {
     .nav-backdrop {
       display: none !important;
     }

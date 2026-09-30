@@ -335,7 +335,7 @@ const items: GalleryItem[] = [
   }
 
   /* ─── Tablet y Desktop ───────────────────────────────────── */
-  @media (min-width: 580px) {
+  @media (min-width: 580px) and (max-width: 767px) {
     .vive-grid {
       gap: 1rem;
     }
@@ -346,6 +346,58 @@ const items: GalleryItem[] = [
     .camera-icon {
       width: 36px;
       height: 36px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .vive-section {
+      padding-block: 4.5rem;
+    }
+
+    .vive-header {
+      margin-bottom: 2.25rem;
+    }
+
+    .vive-title {
+      font-size: 2.25rem;
+    }
+
+    .vive-grid {
+      gap: 1.25rem;
+    }
+
+    .placeholder-box,
+    .photo-card {
+      border-radius: 12px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .vive-section {
+      padding-block: 5.5rem;
+    }
+
+    .vive-header {
+      margin-bottom: 2.75rem;
+    }
+
+    .vive-title {
+      font-size: 2.75rem;
+    }
+
+    .vive-grid {
+      gap: 1.5rem;
+    }
+
+    .placeholder-box,
+    .photo-card {
+      border-radius: 14px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .vive-grid {
+      gap: 1.75rem;
     }
   }
 
