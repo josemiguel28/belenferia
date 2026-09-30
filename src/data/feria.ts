@@ -319,22 +319,22 @@ export interface Place {
 
 export const restaurants: Place[] = [
   {
-    name: "La Ermita",
+    name: "Sabores La Ermita",
     tagline: "Comida típica hondureña",
-    description: "Baleadas, platos del día y frescos naturales en el corazón del pueblo.",
+    description: "Pupusas, platos del día y frescos naturales en el corazón del pueblo.",
     hours: "7:00 AM – 9:00 PM",
-    address: "Calle Principal, frente al Parque",
+    address: "Frente a iglesia Católica La Ermita",
     image: "/images/laermita.avif",
-    mapsUrl: "https://maps.google.com",
+    mapsUrl: "https://maps.app.goo.gl/qioXPZz2QwYxTcFBA",
   },
   {
-    name: "Comedor Lesly",
-    tagline: "Cocina casera de siempre",
-    description: "Sopas, antojitos y desayunos hechos con amor. El sabor de casa.",
-    hours: "6:00 AM – 8:00 PM",
-    address: "Barrio El Centro, una cuadra del mercado",
-    image: "/images/laermita.avif",
-    mapsUrl: "https://maps.google.com",
+    name: "Comedor la Bendición",
+    tagline: "Comida típica hondureña",
+    description: "Baleadas, pollo chuco, y tacos flauta.",
+    hours: "9:00 AM – 9:00 PM",
+    address: "Una cuadra abajo del parque central",
+    image: "/images/labendicion.avif",
+    mapsUrl: "https://maps.app.goo.gl/ShantXBXvXLLJ1Ej6",
   },
 ];
 
@@ -342,11 +342,11 @@ export const cafes: Place[] = [
   {
     name: "El Portal de Bélen Café",
     tagline: "Café de altura local",
-    description: "Café cultivado en las montañas de Belén, pasteles artesanales y buen ambiente.",
-    hours: "7:00 AM – 7:00 PM",
+    description: "Café cultivado en las montañas de Belén, postres y buen ambiente.",
+    hours: "9:00 AM – 7:00 PM",
     address: "Parque Central",
     image: "/images/elportal.avif",
-    mapsUrl: "https://maps.google.com",
+    mapsUrl: "https://maps.app.goo.gl/2ACCvBXXymLRbhRz5",
   },
 ];
 
@@ -354,11 +354,11 @@ export const hotels: Place[] = [
   {
     name: "Hotel Posada Bélen",
     tagline: "Cómodo y bien ubicado",
-    description: "Habitaciones limpias, wifi y desayuno incluido. A dos cuadras de todo.",
+    description: "Habitaciones limpias, wifi y restaurante. A dos cuadras de todo.",
     hours: "Recepción 24h",
     address: "Una cuadra abajo del parque central",
     image: "/images/posadabelen.avif",
-    mapsUrl: "https://maps.google.com",
+    mapsUrl: "https://maps.app.goo.gl/vngr63xHDu6YyG4YA",
   },
 ];
 

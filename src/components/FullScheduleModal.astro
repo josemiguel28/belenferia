@@ -114,21 +114,14 @@ const dateRangeSubtitle = `${startDayNum}–${endDayNum} de ${monthName}`;
                       data-title={act.title}
                       data-time={act.time}
                       data-date={fullLabel}
-                      data-location={act.location}
                       data-category={act.category}
                       data-description={act.description ?? ""}
                       data-maps-url={act.mapsUrl ?? ""}
-                      aria-label={`Ver detalles de ${act.title}, a las ${act.time} en ${act.location}`}
+                      aria-label={`Ver detalles de ${act.title}, a las ${act.time}`}
                     >
                       <span class="act-time">{act.time}</span>
                       <div class="act-info">
                         <p class="act-title">{act.title}</p>
-                        <p class="act-loc">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="act-loc-icon" aria-hidden="true">
-                            <path fill-rule="evenodd" d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.14c.186-.096.446-.24.757-.433.62-.384 1.445-.966 2.274-1.765C15.302 14.988 17 12.493 17 9A7 7 0 1 0 3 9c0 3.492 1.698 5.988 3.355 7.584a13.731 13.731 0 0 0 2.273 1.765 11.842 11.842 0 0 0 .976.541l.062-.029.018-.008.006-.003ZM10 11.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clip-rule="evenodd"/>
-                          </svg>
-                          <span>{act.location}</span>
-                        </p>
                       </div>
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="act-chevron" aria-hidden="true">
                         <path fill-rule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
@@ -627,23 +620,6 @@ const dateRangeSubtitle = `${startDayNum}–${endDayNum} de ${monthName}`;
     color: var(--color-ink);
     margin: 0;
     word-break: break-word;
-  }
-
-  .act-loc {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    color: var(--color-muted);
-    margin: 0;
-  }
-
-  .act-loc-icon {
-    width: 0.8125rem;
-    height: 0.8125rem;
-    flex-shrink: 0;
-    opacity: 0.7;
   }
 
   .act-chevron {
