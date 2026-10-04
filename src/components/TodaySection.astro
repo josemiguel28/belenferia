@@ -120,7 +120,7 @@ const daysUntilText = daysUntil === 1 ? "Falta 1 día" : `Faltan ${daysUntil} d�
           <h2 class="today-title">La feria comienza pronto</h2>
           <div class="state-badge-row">
             <span class="state-date-tag">5 de octubre de 2026</span>
-            <span class="state-countdown-badge">{daysUntilText}</span>
+            <span class="state-countdown-badge" data-countdown-badge>{daysUntilText}</span>
           </div>
           <p class="state-desc">
             Conoce el programa de actividades de la Feria Patronal de Belén.
@@ -216,6 +216,23 @@ const daysUntilText = daysUntil === 1 ? "Falta 1 día" : `Faltan ${daysUntil} d�
 
   </div>
 </section>
+
+<script>
+  import { getFairState } from "../utils/fairState";
+
+  function syncCountdown() {
+    const badge = document.querySelector<HTMLElement>("[data-countdown-badge]");
+    if (!badge) return;
+
+    const state = getFairState();
+    if (state.status === "BEFORE" && typeof state.daysUntil === "number") {
+      badge.textContent = state.daysUntil === 1 ? "Falta 1 día" : `Faltan ${state.daysUntil} días`;
+    }
+  }
+
+  syncCountdown();
+  document.addEventListener("astro:page-load", syncCountdown);
+</script>
 
 <style>
   /* ─── Sección ────────────────────────────────────── */
