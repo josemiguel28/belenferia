@@ -269,7 +269,7 @@ export const feria: FeriaInfo = {
       activities: [
         {
           time: "9:00 AM",
-          title: "Feria Gastronómica y Competencia de la Sopa de Gallina India",
+          title: "Primer Festival de la Sopa de Gallina India Plaza Central",
           location: "Plaza Municipal",
           category: "gastronomico",
           featured: true,
@@ -282,7 +282,7 @@ export const feria: FeriaInfo = {
         },
         {
           time: "3:00 PM",
-          title: "Pelea de Gallos",
+          title: "Pelea de Gallos Instalaciones AGABEL",
           location: "Galera Municipal",
           category: "tradicional",
         },
@@ -294,7 +294,7 @@ export const feria: FeriaInfo = {
         },
         {
           time: "11:00 PM",
-          title: "Toro Fuego — Carnaval de Cierre",
+          title: "Carnaval de Cierre con Tsunami Discomovil",
           location: "Plaza Municipal",
           category: "cultural",
         },
@@ -515,5 +515,38 @@ export const sponsors: Sponsor[] = [
     name: "",
     logo: "/images/sponsors/webtoop.avif",
   },
+  {
+    name: "",
+    logo: "/images/sponsors/cocabel.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/distribuidora-madrid.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/fisio.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/kairos.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/kr-motorepuestos.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/nuria-lara.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/the-cacique.avif",
+  },
+  {
+    name: "",
+    logo: "/images/sponsors/vialenca.avif",
+  },
+
 ];
 
